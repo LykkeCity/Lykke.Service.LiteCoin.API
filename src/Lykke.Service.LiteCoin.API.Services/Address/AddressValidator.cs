@@ -5,6 +5,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Address
 {
     public class AddressValidator: IAddressValidator
     {
+        private readonly Network _network;
+
+        public AddressValidator(Network network)
+        {
+            _network = network;
+        }
+
         public bool IsValid(string address)
         {
             var addr = GetBitcoinAddress(address);
@@ -16,7 +23,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Address
         {
             try
             {
-                return BitcoinAddress.Create(address);
+                
+                return BitcoinAddress.Create(address, _network);
             }
             catch
             {
