@@ -22,6 +22,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
         public long FeeSatoshi { get; set; }
         public DateTime Updated { get; set; }
         public string TxHash { get; set; }
+        public int UpdatedAtBlockHeight { get; set; }
 
         public static ObservableOperationEntity Map(string partitionKey, string rowKey,
             IObservableOperation source)
@@ -38,7 +39,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 Status = source.Status.ToString(),
                 Updated = source.Updated,
                 TxHash = source.TxHash,
-                FeeSatoshi = source.FeeSatoshi
+                FeeSatoshi = source.FeeSatoshi,
+                UpdatedAtBlockHeight = source.UpdatedAtBlockHeight
             };
         }
 

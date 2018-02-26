@@ -51,51 +51,68 @@ namespace Lykke.Job.LiteCoin.Functions
 
             foreach (var unconfirmedTransaction in unconfirmedTxs)
             {
-                var operationMeta =await _operationMetaRepository.Get(unconfirmedTransaction.OperationId);
-                if (operationMeta == null)
+                try
                 {
-                    await _log.WriteWarningAsync(nameof(UpdateObservableOperations), nameof(DetectUnconfirmedTransactions),
-                        unconfirmedTransaction.ToJson(), "OperationMeta not found");
-                    continue;
+                    await CheckUnconfirmedTransaction(unconfirmedTransaction);
+
                 }
-
-                var confirmationCount = await _blockChainProvider.GetTxConfirmationCount(unconfirmedTransaction.TxHash);
-
-                var isCompleted = confirmationCount >= _confirmationsSettings.MinConfirmationsToDetectOperation;
-;
-                if (isCompleted)
+                catch (Exception e)
                 {
-                    //Force update balances
-                    var fromAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.FromAddress);
-                    var toAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.ToAddress);
-                    
-
-                    var operationCompletedLoggingContext = new
-                    {
-                        unconfirmedTransaction.OperationId,
-                        unconfirmedTransaction.TxHash,
-                        fromAddressUpdatedBalance,
-                        toAddressUpdatedBalance
-                    };
-
-                    await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
-                        OperationEventType.DetectedOnBlockChain, operationCompletedLoggingContext));
-
-                    await _log.WriteInfoAsync(nameof(UpdateBalanceFunctions), nameof(DetectUnconfirmedTransactions),
-                        operationCompletedLoggingContext.ToJson(),
-                        "Operation completed");
-
-
-                    await _unconfirmedTransactionRepository.DeleteIfExist(unconfirmedTransaction.OperationId);
+                    await _log.WriteErrorAsync(nameof(UpdateObservableOperations), nameof(DetectUnconfirmedTransactions), unconfirmedTransaction.ToJson(), e);
                 }
-
-                var status = isCompleted
-                    ? BroadcastStatus.Completed
-                    : BroadcastStatus.InProgress;
-
-                await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operationMeta, status,
-                    unconfirmedTransaction.TxHash));
             }
+        }
+
+        private async Task CheckUnconfirmedTransaction(IUnconfirmedTransaction unconfirmedTransaction)
+        {
+            var operationMeta = await _operationMetaRepository.Get(unconfirmedTransaction.OperationId);
+            if (operationMeta == null)
+            {
+                await _log.WriteWarningAsync(nameof(UpdateObservableOperations), nameof(DetectUnconfirmedTransactions),
+                    unconfirmedTransaction.ToJson(), "OperationMeta not found");
+
+                return;
+            }
+
+            var confirmationCount = await _blockChainProvider.GetTxConfirmationCount(unconfirmedTransaction.TxHash);
+
+            var isCompleted = confirmationCount >= _confirmationsSettings.MinConfirmationsToDetectOperation;
+            ;
+            if (isCompleted)
+            {
+                //Force update balances
+                var fromAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.FromAddress);
+                var toAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.ToAddress);
+
+
+                var operationCompletedLoggingContext = new
+                {
+                    unconfirmedTransaction.OperationId,
+                    unconfirmedTransaction.TxHash,
+                    fromAddressUpdatedBalance,
+                    toAddressUpdatedBalance
+                };
+
+                await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
+                    OperationEventType.DetectedOnBlockChain, operationCompletedLoggingContext));
+
+                await _log.WriteInfoAsync(nameof(UpdateBalanceFunctions), nameof(DetectUnconfirmedTransactions),
+                    operationCompletedLoggingContext.ToJson(),
+                    "Operation completed");
+
+
+                await _unconfirmedTransactionRepository.DeleteIfExist(unconfirmedTransaction.OperationId);
+            }
+
+            var status = isCompleted
+                ? BroadcastStatus.Completed
+                : BroadcastStatus.InProgress;
+
+            var lastBlockHeight = await _blockChainProvider.GetLastBlockHeight();
+
+            await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operationMeta, status,
+                unconfirmedTransaction.TxHash, 
+                lastBlockHeight));
         }
     }
 }

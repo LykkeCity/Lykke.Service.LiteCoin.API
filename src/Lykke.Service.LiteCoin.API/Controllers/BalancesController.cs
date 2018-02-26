@@ -94,7 +94,8 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 Address = p.Address,
                 Balance = MoneyConversionHelper.SatoshiToContract(p.BalanceSatoshi),
-                AssetId = Constants.Assets.LiteCoin.AssetId
+                AssetId = Constants.Assets.LiteCoin.AssetId,
+                Block = p.UpdatedAtBlockHeight
             }).ToList().AsReadOnly());
         }
     }

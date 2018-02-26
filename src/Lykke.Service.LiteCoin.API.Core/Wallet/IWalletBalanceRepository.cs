@@ -10,7 +10,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         string Address { get; }
         long BalanceSatoshi { get; }
         DateTime Updated { get; }
-        
+
+        int UpdatedAtBlockHeight { get; }
     }
 
 
@@ -20,14 +21,15 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         public string Address { get; set; }
         public long BalanceSatoshi { get; set; }
         public DateTime Updated { get; set; }
-
-        public static WalletBalance Create(string address, long balanceSatoshi, DateTime? updated = null)
+        public int UpdatedAtBlockHeight { get; set; }
+        public static WalletBalance Create(string address, long balanceSatoshi, int updatedAtBlock, DateTime? updated = null)
         {
             return new WalletBalance
             {
                 Address = address,
                 BalanceSatoshi = balanceSatoshi,
-                Updated = updated ?? DateTime.UtcNow
+                Updated = updated ?? DateTime.UtcNow,
+                UpdatedAtBlockHeight = updatedAtBlock
             };
         }
     }

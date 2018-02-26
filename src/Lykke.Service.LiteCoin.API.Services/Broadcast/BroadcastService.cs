@@ -54,12 +54,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
 
             await _transactionBlobStorage.AddOrReplaceTransaction(operationId,TransactionBlobType.BeforeBroadcast, tx.ToHex());
 
+            var lastBlockHeight = await _blockChainProvider.GetLastBlockHeight();
+
             await _blockChainProvider.BroadCastTransaction(tx);
             
             await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(operationId, OperationEventType.Broadcasted));
 
             await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operation,
-                BroadcastStatus.InProgress, tx.GetHash().ToString()));
+                BroadcastStatus.InProgress, 
+                tx.GetHash().ToString(), 
+                lastBlockHeight));
 
             await _unconfirmedTransactionRepository.InsertOrReplace(
                 UnconfirmedTransaction.Create(operationId, tx.GetHash().ToString()));
