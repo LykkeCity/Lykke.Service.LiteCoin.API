@@ -82,11 +82,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId, fromBitcoinAddress, toBitcoinAddress,
                 request.AssetId, new Money(amountSatoshi), request.IncludeFee);
 
-
-
+            
             return new BuildTransactionResponse
             {
-                TransactionContext = tx.ToHex()
+                TransactionContext = tx
             };
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Core.Transactions
@@ -8,6 +9,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
         Transaction TransactionData { get; }
         Money Fee { get; }
         Money Amount { get; }
+        IEnumerable<ICoin> SpentCoins { get; }
     }
     public interface ITransactionBuilderService
     {

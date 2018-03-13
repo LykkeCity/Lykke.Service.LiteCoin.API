@@ -4,6 +4,7 @@ using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using NBitcoin;
+using NBitcoin.JsonConverters;
 
 namespace Lykke.Service.LiteCoin.API.Services.Operations
 {
@@ -22,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _transactionBlobStorage = transactionBlobStorage;
         }
 
-        public async Task<Transaction> GetOrBuildTransferTransaction(Guid operationId,
+        public async Task<string> GetOrBuildTransferTransaction(Guid operationId,
             BitcoinAddress fromAddress, 
             BitcoinAddress toAddress,
             string assetId,
@@ -31,21 +32,23 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         {
             if (await _operationMetaRepository.Exist(operationId))
             {
-                var alreadyBuildedTransaction = await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
-
-                return Transaction.Parse(alreadyBuildedTransaction);
+                return await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
             }
             
             var buildedTransaction = await _transactionBuilder.GetTransferTransaction(fromAddress, toAddress, amountToSend, includeFee);
 
-            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial,
-                buildedTransaction.TransactionData.ToHex());
+            var transactionContext =
+                Serializer.ToString((tx:buildedTransaction.TransactionData, spentCoins: buildedTransaction.SpentCoins));
+
+            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, 
+                TransactionBlobType.Initial,
+                transactionContext);
 
             var operation = OperationMeta.Create(operationId, fromAddress.ToString(), toAddress.ToString(), assetId,
                 buildedTransaction.Amount.Satoshi, buildedTransaction.Fee.Satoshi, includeFee);
             await _operationMetaRepository.Insert(operation);
 
-            return buildedTransaction.TransactionData;
+            return transactionContext;
         }
     }
 }

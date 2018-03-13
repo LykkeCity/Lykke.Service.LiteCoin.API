@@ -16,8 +16,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         public Transaction TransactionData { get; set; }
         public Money Fee { get; set; }
         public Money Amount { get; set; }
+        public IEnumerable<ICoin> SpentCoins { get; set; }
 
-        public static BuildedTransaction Create(Transaction transaction, Money fee, Money amount)
+        public static BuildedTransaction Create(Transaction transaction, Money fee, Money amount, IEnumerable<ICoin> spentCoins)
         {
             return new BuildedTransaction
             {
@@ -93,8 +94,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             builder.SendFees(calculatedFee);
 
             var tx = builder.BuildTransaction(false);
+            var spentCoins = builder.FindSpentCoins(tx);
 
-            return BuildedTransaction.Create(tx, calculatedFee, amount);
+            return BuildedTransaction.Create(tx, calculatedFee, amount, spentCoins);
         }
     }
 
