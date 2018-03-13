@@ -24,7 +24,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             {
                 Amount = amount,
                 Fee = fee,
-                TransactionData = transaction
+                TransactionData = transaction,
+                SpentCoins = spentCoins
             };
         }
     }
