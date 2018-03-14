@@ -8,6 +8,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
     {
         Task<Transaction> GetOrBuildTransferTransaction(Guid operationId, 
             BitcoinAddress fromAddress,
+            PubKey fromAddressPubkey,
             BitcoinAddress toAddress,
             string assetId,
             Money amountToSend, 

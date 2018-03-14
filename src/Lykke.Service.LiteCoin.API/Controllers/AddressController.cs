@@ -23,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             return new AddressValidationResponse
             {
-                IsValid = _addressValidator.IsValid(address)
+                IsValid = _addressValidator.IsAddressValid(address)
             };
         }
     }
