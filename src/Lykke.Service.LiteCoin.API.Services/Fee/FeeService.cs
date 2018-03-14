@@ -4,50 +4,34 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
-    public class FeeService:IFeeService
+    public class FeeService : IFeeService
     {
         private readonly IFeeRateFacade _feeRateFacade;
-        private readonly long _minFeeValueSatoshi;
-        private readonly long _maxFeeValueSatoshi;
 
-        public FeeService(IFeeRateFacade feeRateFacade, long minFeeValueSatoshi, long maxFeeValueSatoshi)
+        public FeeService(IFeeRateFacade feeRateFacade)
         {
             _feeRateFacade = feeRateFacade;
-            _minFeeValueSatoshi = minFeeValueSatoshi;
-            _maxFeeValueSatoshi = maxFeeValueSatoshi;
         }
 
         public async Task<Money> CalcFeeForTransaction(Transaction tx)
         {
             var size = tx.ToBytes().Length;
 
-            var feeFromFeeRate = (await GetFeeRate()).GetFee(size);
-
-            return CheckMinMaxThreshold(feeFromFeeRate); 
+            return (await GetFeeRate()).GetFee(size);
         }
 
-        public  async Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
+        public async Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
         {
             var feeRate = await GetFeeRate();
 
-            var feeFromFeeRate = builder.EstimateFees(builder.BuildTransaction(false), feeRate);
-
-            return CheckMinMaxThreshold(feeFromFeeRate);
+            return builder.EstimateFees(builder.BuildTransaction(false), feeRate);
         }
 
         public async Task<FeeRate> GetFeeRate()
         {
-            var feePerByte = await _feeRateFacade.GetFeePerByte();
+            var feePerKiloByte = await _feeRateFacade.GetFeePerKiloByte();
 
-            return new FeeRate(new Money(feePerByte * 1024, MoneyUnit.Satoshi));
-        }
-
-        private Money CheckMinMaxThreshold(Money fromFeeRate)
-        {
-            var min = new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
-            var max = new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
-
-            return Money.Max(Money.Min(fromFeeRate, max), min);
+            return new FeeRate(new Money(feePerKiloByte, MoneyUnit.Satoshi));
         }
     }
 }
