@@ -64,7 +64,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
 
         public async Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
-            var t = await _storage.GetDataAsync(WalletBalanceEntity.GeneratePartitionKey());
             var result = await _storage.GetDataWithContinuationTokenAsync(WalletBalanceEntity.GeneratePartitionKey(), take, continuation);
 
             return PaginationResult<IWalletBalance>.Create(result.Entities.Cast<IWalletBalance>(), result.ContinuationToken);
