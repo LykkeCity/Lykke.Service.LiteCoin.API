@@ -66,7 +66,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         {
             var result = await _storage.GetDataWithContinuationTokenAsync(WalletBalanceEntity.GeneratePartitionKey(), take, continuation);
 
-            return PaginationResult<IWalletBalance>.Create(result.Entities.Cast<IWalletBalance>(), result.ContinuationToken);
+            return PaginationResult<IWalletBalance>.Create(result.Entities, result.ContinuationToken);
         }
     }
 }
