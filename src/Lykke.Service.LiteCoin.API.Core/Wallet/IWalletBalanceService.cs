@@ -12,5 +12,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation);
         Task<IWalletBalance> UpdateBalance(string address);
         Task<IWalletBalance> UpdateBalance(IObservableWallet wallet);
+        Task<IEnumerable<IWalletBalance>> UpdateBalanceBatched(IEnumerable<IObservableWallet> wallets);
     }
 }
