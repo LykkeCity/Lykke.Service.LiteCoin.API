@@ -53,7 +53,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
 
         public Task InsertIfNotExist(IOperationEvent operationEvent)
         {
-            return _storage.InsertAsync(OperationEventTableEntity.Create(operationEvent));
+            return _storage.TryInsertAsync(OperationEventTableEntity.Create(operationEvent));
         }
 
         public async Task<bool> Exist(Guid operationId, OperationEventType type)
