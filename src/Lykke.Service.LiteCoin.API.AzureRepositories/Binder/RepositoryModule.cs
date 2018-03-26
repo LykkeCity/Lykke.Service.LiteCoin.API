@@ -3,10 +3,12 @@ using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Asset;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Fee;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Wallet;
 using Lykke.Service.LiteCoin.API.Core.Asset;
+using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
@@ -67,6 +69,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     AzureTableStorage<WalletBalanceEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "WalletBalances", _log)))
                 .As<IWalletBalanceRepository>();
+
+
+            builder.RegisterInstance(new DynamicFeeRateRepository(
+                    AzureTableStorage<DynamicFeeRateEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "DynamicFeeRate", _log)))
+                .As<IDynamicFeeRateRepository>();
         }
 
         private void RegisterBlob(ContainerBuilder builder)

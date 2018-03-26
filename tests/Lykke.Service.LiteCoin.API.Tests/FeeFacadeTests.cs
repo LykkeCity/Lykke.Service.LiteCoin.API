@@ -22,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feePerByte = 100;
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
-            var feeFacade = new FeeService(feeRateService.Object, 100, 1000);
+            var feeFacade = new FeeService(feeRateService.Object);
 
             var txBuilder = GetTestTx(Network.RegTest);
 
@@ -38,55 +38,14 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feePerByte = 100;
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
-            var feeFacade = new FeeService(feeRateService.Object, 100, 1000);
+            var feeFacade = new FeeService(feeRateService.Object);
 
             var txBuilder = GetTestTx(Network.RegTest);
 
             await feeFacade.CalcFeeForTransaction(txBuilder.BuildTransaction(true));
         }
 
-
-
-        [Fact]
-        public async Task ReturnsFeeMaxValueIfCalculatedFeeBiggerThanMaxValue()
-        {
-
-            PrepareNetworks.EnsureLiteCoinPrepared();
-
-            var feePerByte = 9999;
-            var feeRateService = CreateFeeRateFacade(feePerByte);
-
-            var feeMaxValue = 1000;
-            var feeFacade = new FeeService(feeRateService.Object, 100, feeMaxValue);
-
-            var txBuilder = GetTestTx(Network.RegTest);
-
-            var fee = await feeFacade.CalcFeeForTransaction(txBuilder.BuildTransaction(true));
-
-            Assert.True(fee.Satoshi == feeMaxValue);
-        }
-
-
-        [Fact]
-        public async Task ReturnsFeeMinValueIfCalculatedFeeLessThanMinValue()
-        {
-
-            PrepareNetworks.EnsureLiteCoinPrepared();
-
-            var feePerByte = 1;
-            var feeRateService = CreateFeeRateFacade(feePerByte);
-
-            var feeMaxValue = 1000;
-            var feeMinValue = 999;
-            var feeFacade = new FeeService(feeRateService.Object, feeMinValue, feeMaxValue);
-
-            var txBuilder = GetTestTx(Network.RegTest);
-
-            var fee = await feeFacade.CalcFeeForTransaction(txBuilder.BuildTransaction(true));
-
-            Assert.True(fee.Satoshi == feeMinValue);
-        }
-
+        
         private TransactionBuilder GetTestTx(Network network)
         {
             var tx1 = Transaction.Parse(
@@ -119,7 +78,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var result = new Mock<IFeeRateFacade>();
 
-            result.Setup(p => p.GetFeePerByte())
+            result.Setup(p => p.GetFeePerKiloByte())
                 .ReturnsAsync(feePerByte);
 
             return result;
