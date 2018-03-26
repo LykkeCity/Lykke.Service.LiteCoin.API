@@ -5,6 +5,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Fee
 
     public interface IFeeRateFacade
     {
-        Task<int> GetFeePerByte();
+        Task<int> GetFeePerKiloByte();
+        Task UpdateFeeRate();
     }
 }

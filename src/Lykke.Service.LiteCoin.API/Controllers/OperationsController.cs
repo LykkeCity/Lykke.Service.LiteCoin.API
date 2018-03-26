@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Common;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Address;
@@ -11,6 +12,7 @@ using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Helpers;
+using Lykke.Service.LiteCoin.API.Models.Operations;
 using Microsoft.AspNetCore.Mvc;
 using NBitcoin;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -78,12 +80,28 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BusinessException("Invalid operation id (GUID)", ErrorCode.BadInputParameter);
             }
 
+            PubKey fromAddressPubkey = null;
+            var pubKeyString = request.FromAddressContext?.DeserializeJson<AddressContextContract>()?.PubKey;
 
-            var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId, fromBitcoinAddress, toBitcoinAddress,
-                request.AssetId, new Money(amountSatoshi), request.IncludeFee);
+            if (pubKeyString != null)
+            {
+                if (!_addressValidator.IsPubkeyValid(pubKeyString))
+                {
 
+                    throw new BusinessException("Invalid pubkey string", ErrorCode.BadInputParameter);
+                }
 
+                fromAddressPubkey = _addressValidator.GetPubkey(pubKeyString);
+            }
 
+            var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId, 
+                fromBitcoinAddress, 
+                fromAddressPubkey, 
+                toBitcoinAddress, 
+                request.AssetId, 
+                new Money(amountSatoshi), 
+                request.IncludeFee);
+            
             return new BuildTransactionResponse
             {
                 TransactionContext = tx.ToHex()

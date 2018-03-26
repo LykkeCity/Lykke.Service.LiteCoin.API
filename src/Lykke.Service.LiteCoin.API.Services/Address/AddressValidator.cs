@@ -12,7 +12,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Address
             _network = network;
         }
 
-        public bool IsValid(string address)
+    
+        public bool IsAddressValid(string address)
         {
             var addr = GetBitcoinAddress(address);
 
@@ -30,6 +31,23 @@ namespace Lykke.Service.LiteCoin.API.Services.Address
             {
                 return null;
             }
+        }
+
+        public bool IsPubkeyValid(string pubkey)
+        {
+            return GetPubkey(pubkey) != null;
+        }
+
+        public PubKey GetPubkey(string pubkey)
+        {
+            try
+            {
+                return new PubKey(pubkey);
+            }
+            catch
+            {
+                return null;
+            }        
         }
     }
 }

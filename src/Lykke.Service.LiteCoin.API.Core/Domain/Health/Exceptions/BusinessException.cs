@@ -29,7 +29,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         EntityAlreadyExist = 11,
         EntityNotExist = 12,
         TransactionAlreadyBroadcasted = 13,
-        BlockChainApiError = 14
+        BlockChainApiError = 14,
+        NotEnoughFunds = 15
 
     }
 }

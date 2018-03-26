@@ -56,16 +56,21 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
 
         private void RegisterFeeServices(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte))
+            builder.RegisterInstance(new FeeSettings
+            {
+                DefaultFeePerKyloByte = _settings.CurrentValue.DefaultFeePerKyloByte,
+                DynamicFeeProviderUrl = _settings.CurrentValue.DynamicFeeProviderUrl,
+                MaxFeePerKyloByte = _settings.CurrentValue.MaxFeePerKyloByte,
+                MinFeePerKyloByte = _settings.CurrentValue.MinFeePerKyloByte
+            }).AsSelf();
+
+            builder.RegisterType<DynamicFeeProvider>()
+                .As<IDynamicFeeProvider>();
+
+            builder.RegisterType<FeeRateFacade>()
                 .As<IFeeRateFacade>();
 
-            builder.Register(x =>
-            {
-                var resolver = x.Resolve<IComponentContext>();
-                return new FeeService(resolver.Resolve<IFeeRateFacade>(), 
-                    _settings.CurrentValue.MinFeeValue, 
-                    _settings.CurrentValue.MaxFeeValue);
-            }).As<IFeeService>();
+            builder.RegisterType<FeeService>().As<IFeeService>();
         }
 
         private void RegisterAddressValidatorServices(ContainerBuilder builder)
