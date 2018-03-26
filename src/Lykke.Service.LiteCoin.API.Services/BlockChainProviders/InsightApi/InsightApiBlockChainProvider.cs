@@ -171,9 +171,9 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
                 return await Retry.Try(() => url.GetJsonAsync<T>(), NeedToRetryException, tryCount, _log);
             }
-            catch (FlurlHttpException)
+            catch (FlurlHttpException e)
             {
-                throw new BusinessException("Error while proceeding operation within Blockchain Insight Api", ErrorCode.BlockChainApiError);
+                throw new BusinessException("Error while proceeding operation within Blockchain Insight Api", ErrorCode.BlockChainApiError, e);
             }
         }
     }
