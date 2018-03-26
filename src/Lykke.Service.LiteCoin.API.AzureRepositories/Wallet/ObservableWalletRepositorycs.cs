@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -60,6 +61,13 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         public async Task<IEnumerable<IObservableWallet>> GetAll()
         {
             return await _storage.GetDataAsync(ObservableWalletEntity.GeneratePartitionKey());
+        }
+
+        public async Task<IPaginationResult<IObservableWallet>> GetPaged(int take, string continuation)
+        {
+            var result = await _storage.GetDataWithContinuationTokenAsync(ObservableWalletEntity.GeneratePartitionKey(), take, continuation);
+
+            return PaginationResult<IObservableWallet>.Create(result.Entities, result.ContinuationToken);
         }
 
         public async Task Delete(string address)

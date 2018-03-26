@@ -118,6 +118,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         {
             builder.RegisterType<ObservableOperationService>().As<IObservableOperationService>();
             builder.RegisterType<WalletBalanceService>().As<IWalletBalanceService>();
+            builder.RegisterInstance(new WalletBalanceSettings
+            {
+                BatchSizeOnUpdate = _settings.CurrentValue.WalletBalanceBatchSizeOnUpdate
+            }).AsSelf();
         }
     }
 }
