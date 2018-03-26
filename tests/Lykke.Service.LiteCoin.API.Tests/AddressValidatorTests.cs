@@ -22,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             foreach (var address in addresses)
             {
-                Assert.True(addressValidator.IsValid(address));
+                Assert.True(addressValidator.IsAddressValid(address));
 
             }
 
@@ -45,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             foreach (var address in addresses)
             {
-                Assert.False(addressValidator.IsValid(address));
+                Assert.False(addressValidator.IsAddressValid(address));
 
             }
 
@@ -67,7 +67,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             foreach (var address in addresses)
             {
-                Assert.True(addressValidator.IsValid(address));
+                Assert.True(addressValidator.IsAddressValid(address));
 
             }
 
@@ -82,7 +82,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var invalidAddress = "invalid";
             var addressValidator = new AddressValidator(NBitcoin.Litecoin.Networks.Testnet);
 
-            Assert.False(addressValidator.IsValid(invalidAddress));
+            Assert.False(addressValidator.IsAddressValid(invalidAddress));
         }
     }
 

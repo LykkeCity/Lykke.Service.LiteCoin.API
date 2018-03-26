@@ -25,6 +25,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
         public async Task<string> GetOrBuildTransferTransaction(Guid operationId,
             BitcoinAddress fromAddress, 
+            PubKey fromAddressPubkey,
             BitcoinAddress toAddress,
             string assetId,
             Money amountToSend, 
@@ -35,7 +36,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
                 return await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
             }
             
-            var buildedTransaction = await _transactionBuilder.GetTransferTransaction(fromAddress, toAddress, amountToSend, includeFee);
+            var buildedTransaction = await _transactionBuilder.GetTransferTransaction(fromAddress, fromAddressPubkey, toAddress, amountToSend, includeFee);
 
             var transactionContext =
                 Serializer.ToString((tx:buildedTransaction.TransactionData, spentCoins: buildedTransaction.SpentCoins));

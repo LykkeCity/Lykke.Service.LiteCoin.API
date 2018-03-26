@@ -7,8 +7,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         public ErrorCode Code { get; private set; }
         public string Text { get; private set; }
 
-        public BusinessException(string text, ErrorCode code)
-            : base(text)
+        public BusinessException(string text, ErrorCode code, Exception innerEx = null)
+            : base(text, innerEx)
         {
             Code = code;
             Text = text;
@@ -29,7 +29,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         EntityAlreadyExist = 11,
         EntityNotExist = 12,
         TransactionAlreadyBroadcasted = 13,
-        BlockChainApiError = 14
+        BlockChainApiError = 14,
+        NotEnoughFunds = 15
 
     }
 }

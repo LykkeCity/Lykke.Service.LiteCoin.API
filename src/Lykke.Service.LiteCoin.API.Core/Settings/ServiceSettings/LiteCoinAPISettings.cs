@@ -9,13 +9,18 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public string InsightAPIUrl { get; set; }
 
         [Optional]
-        public int FeePerByte { get; set; } = 100; // use value greater than default value 100 000 litoshi per kb = 100 litoshi per b. Ref https://bitcoin.stackexchange.com/questions/53821/where-can-i-find-the-current-fee-level-for-ltc
+        public int MinFeePerKyloByte { get; set; } = 200 * 1024;
 
         [Optional]
-        public long MinFeeValue { get; set; } = 100000;
+        public int MaxFeePerKyloByte { get; set; } = 500 * 1024;
+
         [Optional]
-        public long MaxFeeValue { get; set; } = 10000000;
-        
+        public int DefaultFeePerKyloByte { get; set; } = 100 * 1024; // use value greater than default value 100 litoshi per b. Ref https://bitcoin.stackexchange.com/questions/53821/where-can-i-find-the-current-fee-level-for-ltc
+
+
+        [Optional]
+        public string DynamicFeeProviderUrl { get; set; } = "https://api.blockcypher.com/";
+
         [Optional]
         public int MinConfirmationsToDetectOperation { get; set; } = 3;
     }

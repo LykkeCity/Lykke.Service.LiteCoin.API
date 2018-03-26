@@ -35,7 +35,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 409)]
         public async Task<IActionResult> Subscribe(string address)
         {
-            if (!_addressValidator.IsValid(address))
+            if (!_addressValidator.IsAddressValid(address))
             {
                 return BadRequest(ErrorResponse.Create("Invalid address"));
             }
@@ -60,7 +60,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 204)]
         public async Task<IActionResult> Unsubscribe(string address)
         {
-            if (!_addressValidator.IsValid(address))
+            if (!_addressValidator.IsAddressValid(address))
             {
                 return BadRequest(ErrorResponse.Create("Invalid address"));
             }

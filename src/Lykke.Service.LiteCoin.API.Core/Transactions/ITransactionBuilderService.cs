@@ -13,7 +13,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
     }
     public interface ITransactionBuilderService
     {
-        Task<IBuildedTransaction> GetTransferTransaction(BitcoinAddress source, BitcoinAddress destination, Money amount, bool includeFee);
+        Task<IBuildedTransaction> GetTransferTransaction(BitcoinAddress source, PubKey fromAddressPubkey, BitcoinAddress destination, Money amount, bool includeFee);
 
     }
 }

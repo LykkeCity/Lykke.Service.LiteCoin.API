@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
@@ -43,32 +41,42 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         public async Task<IBuildedTransaction> GetTransferTransaction(BitcoinAddress source,
-            BitcoinAddress destination, Money amount, bool includeFee)
+            PubKey fromAddressPubkey,
+            BitcoinAddress destination, 
+            Money amount, 
+            bool includeFee)
         {
             var builder = new TransactionBuilder();
 
-            return await TransferOneDirection(builder, source, amount.Satoshi, destination, includeFee);
+            return await TransferOneDirection(builder, source, fromAddressPubkey, amount.Satoshi, destination, includeFee);
             
         }
 
         private async Task<IBuildedTransaction> TransferOneDirection(TransactionBuilder builder, 
-            BitcoinAddress @from, long amount, BitcoinAddress to, bool includeFee)
+            BitcoinAddress @from,
+            PubKey fromAddressPubkey, 
+            long amount,
+            BitcoinAddress to,
+            bool includeFee)
         {
-            var fromStr = from.ToString();
-            var coins = (await _transactionOutputsService.GetUnspentOutputs(fromStr)).ToList();
-            var balance = coins.Select(o => o.Amount).DefaultIfEmpty()
-                .Sum(o =>  o?.Satoshi ?? 0);
-            if (balance > amount &&
-                balance - amount < new TxOut(Money.Zero, from)
-                    .GetDustThreshold(builder.StandardTransactionPolicy.MinRelayTxFee).Satoshi)
-                amount = balance;
+            var coins = await _transactionOutputsService.GetUnspentOutputs(from.ToString());
 
-            return await SendWithChange(builder,  coins, to, new Money(amount),
-                from, includeFee);
+            if (fromAddressPubkey != null)
+            {
+                var reedem = fromAddressPubkey.WitHash.ScriptPubKey;
+                coins = coins.Select(p => p.ToScriptCoin(reedem));
+            }
+
+            return await SendWithChange(builder, 
+                coins, 
+                to, 
+                new Money(amount),
+                from, 
+                includeFee);
         }
 
         public async Task<IBuildedTransaction> SendWithChange(TransactionBuilder builder, 
-            List<Coin> coins, IDestination destination, Money amount, IDestination changeDestination, bool includeFee)
+            IEnumerable<ICoin> coins, IDestination destination, Money amount, IDestination changeDestination, bool includeFee)
         {
             if (amount.Satoshi <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
