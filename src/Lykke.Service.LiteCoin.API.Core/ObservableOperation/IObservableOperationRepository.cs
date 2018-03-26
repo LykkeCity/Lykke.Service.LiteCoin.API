@@ -23,6 +23,8 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
         long FeeSatoshi { get; }
         DateTime Updated { get;  }
         string TxHash { get; }
+        int UpdatedAtBlockHeight { get; }
+
     }
 
     public class ObervableOperation : IObservableOperation
@@ -37,8 +39,9 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
         public DateTime Updated { get; set; }
         public BroadcastStatus Status { get; set; }
         public string TxHash { get; set; }
+        public int UpdatedAtBlockHeight { get; set; }
 
-        public static ObervableOperation Create(IOperationMeta operation, BroadcastStatus status, string txHash, DateTime? updated = null)
+        public static ObervableOperation Create(IOperationMeta operation, BroadcastStatus status, string txHash, int updatedAtBlockHeight, DateTime? updated = null)
         {
             return new ObervableOperation
             {
@@ -51,7 +54,8 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
                 Status = status,
                 TxHash = txHash,
                 Updated = updated ?? DateTime.UtcNow,
-                FeeSatoshi = operation.FeeSatoshi
+                FeeSatoshi = operation.FeeSatoshi,
+                UpdatedAtBlockHeight = updatedAtBlockHeight
             };
         }
     }

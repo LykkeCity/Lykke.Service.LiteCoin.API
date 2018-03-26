@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
@@ -35,10 +36,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             _observableOperationService = observableOperationService;
         }
 
-        [HttpPost("api/transactions")]
+        [HttpPost("api/transactions/single")]
         [ProducesResponseType(typeof(BuildTransactionResponse), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<BuildTransactionResponse> Build([FromBody] BuildTransactionRequest request)
+        public async Task<BuildTransactionResponse> BuildSingle([FromBody] BuildSingleTransactionRequest request)
         {
             if (request == null)
             {
@@ -118,12 +119,12 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok();
         }
 
-        [HttpGet("api/transactions/broadcast/{operationId}")]
-        [SwaggerOperation(nameof(GetObservableOperation))]
-        [ProducesResponseType(typeof(BroadcastedTransactionResponse),(int)HttpStatusCode.OK)]
+        [HttpGet("api/transactions/broadcast/single/{operationId}")]
+        [SwaggerOperation(nameof(GetObservableSingleOperation))]
+        [ProducesResponseType(typeof(BroadcastedSingleTransactionResponse),(int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IActionResult> GetObservableOperation(Guid operationId)
+        public async Task<IActionResult> GetObservableSingleOperation(Guid operationId)
         {
             var result = await _observableOperationService.GetById(operationId);
 
@@ -146,15 +147,17 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                         throw new InvalidCastException($"Unknown mapping from {status} ");
                 }
             }
+            
 
-            return Ok(new BroadcastedTransactionResponse
+            return Ok(new BroadcastedSingleTransactionResponse
             {
                 Amount = MoneyConversionHelper.SatoshiToContract(result.AmountSatoshi),
                 Fee = MoneyConversionHelper.SatoshiToContract(result.FeeSatoshi),
                 OperationId = result.OperationId,
                 Hash = result.TxHash,
                 Timestamp = result.Updated,
-                State = MapState(result.Status)
+                State = MapState(result.Status),
+                Block = result.UpdatedAtBlockHeight
             });
         }
 

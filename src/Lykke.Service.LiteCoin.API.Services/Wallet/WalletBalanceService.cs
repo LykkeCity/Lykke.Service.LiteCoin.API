@@ -58,10 +58,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             if (wallet != null)
             {
                 var balance = await _blockChainProvider.GetBalanceSatoshiFromUnspentOutputs(wallet.Address, _confirmationsSettings.MinConfirmationsToDetectOperation);
+                var lastBlock = await _blockChainProvider.GetLastBlockHeight();
 
                 if (balance != 0)
                 {
-                    var walletBalanceEntity = WalletBalance.Create(wallet.Address, balance);
+                    var walletBalanceEntity = WalletBalance.Create(wallet.Address, balance, lastBlock);
                     await _balanceRepository.InsertOrReplace(walletBalanceEntity);
 
                     return walletBalanceEntity;

@@ -16,6 +16,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         public string Address { get; set; }
         public long BalanceSatoshi { get; set; }
         public DateTime Updated { get; set; }
+        public int UpdatedAtBlockHeight { get; set; }
 
         public static string GeneratePartitionKey()
         {
@@ -35,7 +36,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
                 BalanceSatoshi = source.BalanceSatoshi,
                 RowKey = GenerateRowKey(source.Address),
                 PartitionKey = GeneratePartitionKey(),
-                Updated = source.Updated
+                Updated = source.Updated,
+                UpdatedAtBlockHeight = source.UpdatedAtBlockHeight
             };
         }
     }
@@ -62,10 +64,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
 
         public async Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
-            var t = await _storage.GetDataAsync(WalletBalanceEntity.GeneratePartitionKey());
             var result = await _storage.GetDataWithContinuationTokenAsync(WalletBalanceEntity.GeneratePartitionKey(), take, continuation);
 
-            return PaginationResult<IWalletBalance>.Create(result.Entities.Cast<IWalletBalance>(), result.ContinuationToken);
+            return PaginationResult<IWalletBalance>.Create(result.Entities, result.ContinuationToken);
         }
     }
 }
