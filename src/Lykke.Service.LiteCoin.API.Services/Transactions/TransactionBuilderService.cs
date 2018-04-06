@@ -85,13 +85,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             
             var calculatedFee = await _feeService.CalcFeeForTransaction(builder);
 
-            if (calculatedFee >= amount)
-            {
-                throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required fee: {calculatedFee} satoshis.",
-                    ErrorCode.BalanceIsLessThanFee);
-            }
-            
             if (includeFee)
             {
                 builder.SubtractFees();
