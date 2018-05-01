@@ -24,7 +24,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         [Optional]
         public int MinConfirmationsToDetectOperation { get; set; } = 3;
 
-        [Optional]
         public int WalletBalanceBatchSizeOnUpdate { get; set; } = 100;
     }
 }
