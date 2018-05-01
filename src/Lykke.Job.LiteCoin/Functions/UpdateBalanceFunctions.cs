@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.JobTriggers.Triggers.Attributes;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 
 namespace Lykke.Job.LiteCoin.Functions
@@ -44,9 +45,7 @@ namespace Lykke.Job.LiteCoin.Functions
                 }
                 catch (Exception e)
                 {
-
-                    await _log.WriteErrorAsync(nameof(UpdateBalanceFunctions), nameof(UpdateBalances), pagedResult.Items.Select(p => p.Address).ToJson(), e);
-                    throw;
+                    throw new BusinessException($"Failed to update balance on addreses: {string.Join(", ", pagedResult.Items.Select(p => p.Address))}", ErrorCode.FailedToUpdateBalance, e);
                 }
 
             } while (continuation!=null);
