@@ -46,6 +46,7 @@ namespace Lykke.Job.LiteCoin.Functions
                 {
 
                     await _log.WriteErrorAsync(nameof(UpdateBalanceFunctions), nameof(UpdateBalances), pagedResult.Items.Select(p => p.Address).ToJson(), e);
+                    throw;
                 }
 
             } while (continuation!=null);
