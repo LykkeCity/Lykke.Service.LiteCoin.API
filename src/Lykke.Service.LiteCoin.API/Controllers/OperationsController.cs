@@ -87,7 +87,6 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 if (!_addressValidator.IsPubkeyValid(pubKeyString))
                 {
-
                     throw new BusinessException("Invalid pubkey string", ErrorCode.BadInputParameter);
                 }
 
@@ -101,10 +100,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 request.AssetId, 
                 new Money(amountSatoshi), 
                 request.IncludeFee);
+
             
             return new BuildTransactionResponse
             {
-                TransactionContext = tx.ToHex()
+                TransactionContext = tx
             };
         }
 
