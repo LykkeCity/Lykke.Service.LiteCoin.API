@@ -51,15 +51,7 @@ namespace Lykke.Job.LiteCoin.Functions
 
             foreach (var unconfirmedTransaction in unconfirmedTxs)
             {
-                try
-                {
-                    await CheckUnconfirmedTransaction(unconfirmedTransaction);
-
-                }
-                catch (Exception e)
-                {
-                    await _log.WriteErrorAsync(nameof(UpdateObservableOperations), nameof(DetectUnconfirmedTransactions), unconfirmedTransaction.ToJson(), e);
-                }
+                await CheckUnconfirmedTransaction(unconfirmedTransaction);
             }
         }
 
