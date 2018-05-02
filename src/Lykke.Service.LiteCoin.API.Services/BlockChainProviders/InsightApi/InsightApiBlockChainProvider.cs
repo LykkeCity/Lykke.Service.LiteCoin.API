@@ -96,10 +96,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int minConfirmationCount)
         {
-            var url = _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/addr/{address}/utxo");
-
-            var resp = await GetJson<AddressUnspentOutputsResponce[]>(url);
+            var resp = await GetUnspentOutputsResponce(address);
 
             return resp.Where(p => p.Confirmation >= minConfirmationCount).Select(MapUnspentCoun);
         }
@@ -113,9 +110,42 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<long> GetBalanceSatoshiFromUnspentOutputs(string address, int minConfirmationCount)
         {
-            var unspentOutputs = await GetUnspentOutputs(address, minConfirmationCount);
+            var unspentOutputs = (await GetUnspentOutputsResponce(address)).Where(p => p.Confirmation >= minConfirmationCount);
 
-            return unspentOutputs.Sum(p => p.Amount.Satoshi);
+            return unspentOutputs.Sum(p => p.Satoshi);
+        }
+
+        public async Task<IEnumerable<(string address, long balance)>> GetBalancesSatoshiFromUnspentOutputsBatched(IEnumerable<string> addresses, int minConfirmationCount)
+        {
+            var allUnspent = (await GetUnspentOutputsResponceBatched(addresses))
+                .Where(p => p.Confirmation >= minConfirmationCount)
+                .ToList();
+            
+            var result = new List<(string address, long balance)>();
+
+            foreach (var address in addresses)
+            {
+                var unspentBalance = allUnspent.Where(p => p.Address == address).Sum(p => p.Satoshi);
+                result.Add((address, unspentBalance));
+            }
+
+            return result;
+        }
+
+        private async Task<IEnumerable<AddressUnspentOutputsResponce>> GetUnspentOutputsResponceBatched(IEnumerable<string> addresses)
+        {
+            var url = _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/addrs/{string.Join(",", addresses)}/utxo");
+
+            return await GetJson<AddressUnspentOutputsResponce[]>(url);
+        }
+
+        private async Task<IEnumerable<AddressUnspentOutputsResponce>> GetUnspentOutputsResponce(string address)
+        {
+            var url = _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/addr/{address}/utxo");
+
+            return await GetJson<AddressUnspentOutputsResponce[]>(url);
         }
 
         private Coin MapUnspentCoun(AddressUnspentOutputsResponce source)

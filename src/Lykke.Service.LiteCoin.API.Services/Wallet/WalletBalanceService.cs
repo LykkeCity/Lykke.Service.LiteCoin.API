@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Pagination;
@@ -60,19 +61,41 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
                 var balance = await _blockChainProvider.GetBalanceSatoshiFromUnspentOutputs(wallet.Address, _confirmationsSettings.MinConfirmationsToDetectOperation);
                 var lastBlock = await _blockChainProvider.GetLastBlockHeight();
 
-                if (balance != 0)
-                {
-                    var walletBalanceEntity = WalletBalance.Create(wallet.Address, balance, lastBlock);
-                    await _balanceRepository.InsertOrReplace(walletBalanceEntity);
-
-                    return walletBalanceEntity;
-                }
-                else
-                {
-                    await _balanceRepository.DeleteIfExist(wallet.Address);
-                }
+                return await UpdateBalance(wallet.Address, balance, lastBlock);
             }
 
+            return null;
+        }
+
+        public async Task<IEnumerable<IWalletBalance>> UpdateBalanceBatched(IEnumerable<IObservableWallet> wallets)
+        {
+            var addressBalances = await _blockChainProvider.GetBalancesSatoshiFromUnspentOutputsBatched(
+                wallets.Select(p => p.Address),
+                _confirmationsSettings.MinConfirmationsToDetectOperation);
+
+            var lastBlock = await _blockChainProvider.GetLastBlockHeight();
+
+            var result = new List<IWalletBalance>();
+
+            foreach (var addressBalanceResult in addressBalances)
+            {
+                result.Add(await UpdateBalance(addressBalanceResult.address, addressBalanceResult.balance, lastBlock));
+            }
+
+            return result;
+        }
+
+        private async Task<IWalletBalance> UpdateBalance(string address, long balance, int lastBlock)
+        {
+            if (balance != 0)
+            {
+                var walletBalanceEntity = WalletBalance.Create(address, balance, lastBlock);
+                await _balanceRepository.InsertOrReplace(walletBalanceEntity);
+
+                return walletBalanceEntity;
+            }
+
+            await _balanceRepository.DeleteIfExist(address);
             return null;
         }
     }
