@@ -15,6 +15,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             _addressValidator = addressValidator;
         }
+
         [SwaggerOperation(nameof(Validate))]
         [ProducesResponseType(typeof(AddressValidationResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
