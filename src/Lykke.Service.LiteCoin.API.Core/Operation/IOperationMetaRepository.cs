@@ -17,6 +17,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
         long FeeSatoshi { get; }
 
         bool IncludeFee { get; }
+
         DateTime Inserted { get; }
     }
 

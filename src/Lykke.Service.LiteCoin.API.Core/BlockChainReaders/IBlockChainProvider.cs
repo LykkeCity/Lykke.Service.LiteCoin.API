@@ -16,5 +16,6 @@ namespace Lykke.Service.LiteCoin.API.Core.BlockChainReaders
         Task<string> GetDestinationAddress(string txHash, uint n);
         Task<long> GetBalanceSatoshiFromUnspentOutputs(string address, int minConfirmationCount);
         Task<IEnumerable<(string address, long balance)>> GetBalancesSatoshiFromUnspentOutputsBatched(IEnumerable<string> addresses, int minConfirmationCount);
+        Task<AggregatedInputsOutputs> GetAggregatedInputsOutputs(string txHash);
     }
 }

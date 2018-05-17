@@ -21,7 +21,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 AreManyInputsSupported = false,
                 AreManyOutputsSupported = false,
-                IsTransactionsRebuildingSupported = false
+                IsTransactionsRebuildingSupported = false,
+                IsPublicAddressExtensionRequired = false,
+                CanReturnExplorerUrl = false,
+                IsTestingTransfersSupported = false,
+                IsReceiveTransactionRequired = false
             };
         }
     }
