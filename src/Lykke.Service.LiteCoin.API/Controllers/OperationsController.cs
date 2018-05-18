@@ -145,6 +145,12 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> GetObservableSingleOperation(Guid operationId)
         {
+            if (!ModelState.IsValid ||
+                !ModelState.IsValidOperationId(operationId))
+            {
+                return BadRequest(ModelState.ToErrorResponce());
+            }
+
             var result = await _observableOperationService.GetById(operationId);
 
             if (result == null)
