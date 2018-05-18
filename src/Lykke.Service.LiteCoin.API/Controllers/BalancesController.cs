@@ -14,6 +14,8 @@ using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Extensions;
 using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
@@ -89,6 +91,9 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 ModelState.AddModelError(nameof(take), "Must be greater than zero");
             }
+
+            ModelState.ValidateContinuationToken(continuation);
+
 
             if (!ModelState.IsValid)
             {
