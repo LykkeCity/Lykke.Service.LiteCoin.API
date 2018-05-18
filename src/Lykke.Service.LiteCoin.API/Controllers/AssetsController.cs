@@ -41,7 +41,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
         [SwaggerOperation(nameof(GetById))]
         [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets/{assetId}")]
         public async Task<IActionResult> GetById(string assetId)
@@ -49,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             var asset = await _assetRepository.GetById(assetId);
             if (asset == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok(new AssetResponse
