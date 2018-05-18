@@ -9,7 +9,10 @@ using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Assets;
 using Lykke.Service.LiteCoin.API.Core.Asset;
 using Lykke.Service.LiteCoin.API.Extensions;
+using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
@@ -32,6 +35,20 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             if (take <= 0)
             {
                 ModelState.AddModelError(nameof(take), "Must be greater than zero");
+            }
+
+            // kinda specific knowledge but there is no 
+            // another way to ensure continuation token
+            if (!string.IsNullOrEmpty(continuation))
+            {
+                try
+                {
+                    JsonConvert.DeserializeObject<TableContinuationToken>(CommonUtils.HexToString(continuation));
+                }
+                catch
+                {
+                    ModelState.AddModelError(nameof(continuation), "Invalid continuation token");
+                }
             }
 
             if (!ModelState.IsValid)
