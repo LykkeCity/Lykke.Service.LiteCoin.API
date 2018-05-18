@@ -37,19 +37,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 ModelState.AddModelError(nameof(take), "Must be greater than zero");
             }
 
-            // kinda specific knowledge but there is no 
-            // another way to ensure continuation token
-            if (!string.IsNullOrEmpty(continuation))
-            {
-                try
-                {
-                    JsonConvert.DeserializeObject<TableContinuationToken>(CommonUtils.HexToString(continuation));
-                }
-                catch
-                {
-                    ModelState.AddModelError(nameof(continuation), "Invalid continuation token");
-                }
-            }
+            ModelState.ValidateContinuationToken(continuation);
 
             if (!ModelState.IsValid)
             {

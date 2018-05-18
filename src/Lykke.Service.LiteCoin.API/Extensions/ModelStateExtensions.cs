@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace Lykke.Service.LiteCoin.API.Extensions
 {
@@ -40,6 +43,25 @@ namespace Lykke.Service.LiteCoin.API.Extensions
             {
                 return true;
             }
+        }
+
+        public static bool ValidateContinuationToken(this ModelStateDictionary self, string continuation)
+        {
+            if (!string.IsNullOrEmpty(continuation))
+            {
+                try
+                {
+                    JsonConvert.DeserializeObject<TableContinuationToken>(CommonUtils.HexToString(continuation));
+                }
+                catch
+                {
+                    self.AddModelError(nameof(continuation), "Invalid continuation token");
+
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
