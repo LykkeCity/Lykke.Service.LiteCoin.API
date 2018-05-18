@@ -65,6 +65,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             [FromQuery]string afterHash,
             [FromQuery]int take)
         {
+            if (take <= 0)
+            {
+                ModelState.AddModelError(nameof(take), "Must be greater than zero");
+            }
+
             if (!_addressValidator.IsAddressValid(address))
             {
                 throw new BusinessException($"Invalid LTC address ${address}", ErrorCode.BadInputParameter);
@@ -83,6 +88,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             [FromQuery]string afterHash,
             [FromQuery]int take)
         {
+            if (take <= 0)
+            {
+                ModelState.AddModelError(nameof(take), "Must be greater than zero");
+            }
+
             if (!_addressValidator.IsAddressValid(address))
             {
                 throw new BusinessException($"Invalid LTC address ${address}", ErrorCode.BadInputParameter);
