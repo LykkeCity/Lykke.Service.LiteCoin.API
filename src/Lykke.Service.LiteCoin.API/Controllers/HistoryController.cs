@@ -67,7 +67,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             if (take <= 0)
             {
-                ModelState.AddModelError(nameof(take), "Must be greater than zero");
+                return BadRequest(new ErrorResponse() { ErrorMessage = $"{nameof(take)} must be greater than zero" });
             }
 
             if (!_addressValidator.IsAddressValid(address))
@@ -90,7 +90,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             if (take <= 0)
             {
-                ModelState.AddModelError(nameof(take), "Must be greater than zero");
+                return BadRequest(new ErrorResponse() {ErrorMessage = $"{nameof(take)} must be greater than zero"});
             }
 
             if (!_addressValidator.IsAddressValid(address))
