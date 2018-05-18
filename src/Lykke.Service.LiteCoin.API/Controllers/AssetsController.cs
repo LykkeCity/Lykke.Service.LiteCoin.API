@@ -34,7 +34,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 ModelState.AddModelError(nameof(take), "Must be greater than zero");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.ToErrorResponce());
             }
