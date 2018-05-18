@@ -28,5 +28,18 @@ namespace Lykke.Service.LiteCoin.API.Extensions
 
             return response;
         }
+
+        public static bool IsValidOperationId(this ModelStateDictionary self, Guid operationId)
+        {
+            if (operationId == Guid.Empty)
+            {
+                self.AddModelError(nameof(operationId), "Operation identifier must not be empty GUID");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }
