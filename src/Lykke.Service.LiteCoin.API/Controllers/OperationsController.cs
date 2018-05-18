@@ -11,6 +11,7 @@ using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
+using Lykke.Service.LiteCoin.API.Extensions;
 using Lykke.Service.LiteCoin.API.Helpers;
 using Lykke.Service.LiteCoin.API.Models.Operations;
 using Microsoft.AspNetCore.Mvc;
@@ -185,6 +186,12 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> RemoveObservableOperation(Guid operationId)
         {
+            if (!ModelState.IsValid ||
+                !ModelState.IsValidOperationId(operationId))
+            {
+                return BadRequest(ModelState.ToErrorResponce());
+            }
+
             await _observableOperationService.DeleteOperations(operationId);
 
             return Ok();
