@@ -26,7 +26,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             _addressValidator = addressValidator;
         }
 
-        [HttpPost("history/from/{address}/observation")]
+        [HttpPost("/api/transactions/history/from/{address}/observation")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult ObserveFrom(
             [FromRoute]string address)
@@ -34,7 +34,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok();
         }
 
-        [HttpPost("history/to/{address}/observation")]
+        [HttpPost("/api/transactions/history/to/{address}/observation")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult ObserveTo(
             [FromRoute]string address)
@@ -42,7 +42,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok();
         }
 
-        [HttpDelete("history/from/{address}/observation")]
+        [HttpDelete("/api/transactions/history/from/{address}/observation")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult DeleteObservationFrom(
             [FromRoute]string address)
@@ -50,7 +50,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok();
         }
 
-        [HttpDelete("history/to/{address}/observation")]
+        [HttpDelete("/api/transactions/history/to/{address}/observation")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult DeleteObservationTo(
             [FromRoute]string address)
@@ -58,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok();
         }
         
-        [HttpGet("history/from/{address}")]
+        [HttpGet("/api/transactions/history/from/{address}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(HistoricalTransactionContract[]))]
         public async Task<IActionResult> GetHistoryFrom(
             [FromRoute]string address,
@@ -76,7 +76,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok(result.Select(p => p.ToHistoricalTransaction()));
         }
 
-        [HttpGet("history/to/{address}")]
+        [HttpGet("/api/transactions/history/to/{address}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(HistoricalTransactionContract[]))]
         public async Task<IActionResult> GetHistoryTo(
             [FromRoute]string address,
