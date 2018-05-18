@@ -8,6 +8,7 @@ using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Assets;
 using Lykke.Service.LiteCoin.API.Core.Asset;
+using Lykke.Service.LiteCoin.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -26,22 +27,32 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(PaginationResponse<AssetResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets")]
-        public async Task<PaginationResponse<AssetResponse>> GetPaged([FromQuery]int take, [FromQuery]string continuation)
+        public async Task<IActionResult> GetPaged([FromQuery]int take, [FromQuery]string continuation)
         {
+            if (take <= 0)
+            {
+                ModelState.AddModelError(nameof(take), "Must be greater than zero");
+            }
+
+            if (ModelState.IsValid)
+            {
+                return BadRequest(ModelState.ToErrorResponce());
+            }
+
             var paginationResult = await _assetRepository.GetPaged(take, continuation);
 
-            return PaginationResponse.From(paginationResult.Continuation, paginationResult.Items.Select(p => new AssetResponse
+            return Ok(PaginationResponse.From(paginationResult.Continuation, paginationResult.Items.Select(p => new AssetResponse
             {
                 Address = p.Address,
                 AssetId = p.AssetId,
                 Accuracy = p.Accuracy,
                 Name = p.Name
-            }).ToList().AsReadOnly());
+            }).ToList().AsReadOnly()));
         }
 
         [SwaggerOperation(nameof(GetById))]
         [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets/{assetId}")]
         public async Task<IActionResult> GetById(string assetId)
@@ -49,7 +60,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             var asset = await _assetRepository.GetById(assetId);
             if (asset == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok(new AssetResponse
