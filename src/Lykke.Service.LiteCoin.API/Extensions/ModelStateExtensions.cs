@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.Extensions
     {
         public static ErrorResponse ToErrorResponce(this ModelStateDictionary modelState)
         {
-            var response = new ErrorResponse();
+            var response = new ErrorResponse() {ModelErrors = new Dictionary<string, List<string>>()};
 
             foreach (var state in modelState)
             {
