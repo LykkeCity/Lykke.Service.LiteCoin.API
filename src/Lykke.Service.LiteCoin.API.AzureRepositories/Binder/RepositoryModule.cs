@@ -75,12 +75,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     AzureTableStorage<DynamicFeeRateEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "DynamicFeeRate", _log)))
                 .As<IDynamicFeeRateRepository>();
-
-
-            builder.RegisterInstance(new BroadcastedTransactionRepository(
-                    AzureTableStorage<BroadcastedTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "BroadcastedTransactions", _log)))
-                .As<IBroadcastedTransactionRepository>();
         }
 
         private void RegisterBlob(ContainerBuilder builder)

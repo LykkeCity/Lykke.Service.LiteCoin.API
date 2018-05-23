@@ -12,12 +12,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 { 
     public class HistoryService:IHistoryService
     {
-        private readonly IBroadcastedTransactionRepository _broadcastedTransactionRepository;
         private readonly IBlockChainProvider _blockChainProvider;
 
-        public HistoryService(IBroadcastedTransactionRepository broadcastedTransactionRepository, IBlockChainProvider blockChainProvider)
+        public HistoryService( IBlockChainProvider blockChainProvider)
         {
-            _broadcastedTransactionRepository = broadcastedTransactionRepository;
             _blockChainProvider = blockChainProvider;
         }
 
@@ -33,7 +31,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
         public async Task<IEnumerable<HistoricalTransactionDto>> GetHistory(BitcoinAddress address, string afterHash, int take, bool isSend)
         {
-            var txIds = (await GetNonExchangeTransactionHashes(address.ToString())).Reverse();
+            var txIds = (await _blockChainProvider.GetTransactionsForAddress(address)).Reverse();
 
             if (!string.IsNullOrEmpty(afterHash))
             {
@@ -58,16 +56,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             }
 
             return result;
-        }
-
-        private async Task<IEnumerable<string>> GetNonExchangeTransactionHashes(string address)
-        {
-            var getExchangeTransactions = _broadcastedTransactionRepository.GetTransactionsForAddress(address);
-            var getAllTransactions = _blockChainProvider.GetTransactionsForAddress(address);
-
-            await Task.WhenAll(getExchangeTransactions, getAllTransactions);
-
-            return getAllTransactions.Result.Except(getExchangeTransactions.Result.Select(p => p.TxHash));
         }
 
         private bool IsSend(AggregatedInputsOutputs tx, string requestedAddress)
