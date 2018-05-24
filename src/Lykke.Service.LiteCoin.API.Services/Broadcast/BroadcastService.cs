@@ -21,7 +21,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         private readonly IOperationEventRepository _operationEventRepository;
         private readonly IObservableOperationRepository _observableOperationRepository;
         private readonly ITransactionBlobStorage _transactionBlobStorage;
-        private readonly IBroadcastedTransactionRepository _broadcastedTransactionRepository;
 
         public BroadcastService(IBlockChainProvider blockChainProvider,
             ILog log, 
@@ -29,8 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             IOperationMetaRepository operationMetaRepository,
             IOperationEventRepository operationEventRepository,
             IObservableOperationRepository observableOperationRepository, 
-            ITransactionBlobStorage transactionBlobStorage, 
-            IBroadcastedTransactionRepository broadcastedTransactionRepository)
+            ITransactionBlobStorage transactionBlobStorage)
         {
             _blockChainProvider = blockChainProvider;
             _log = log;
@@ -39,7 +37,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             _operationEventRepository = operationEventRepository;
             _observableOperationRepository = observableOperationRepository;
             _transactionBlobStorage = transactionBlobStorage;
-            _broadcastedTransactionRepository = broadcastedTransactionRepository;
         }
 
         public async Task BroadCastTransaction(Guid operationId, Transaction tx)
@@ -70,9 +67,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
 
             await _unconfirmedTransactionRepository.InsertOrReplace(
                 UnconfirmedTransaction.Create(operationId, tx.GetHash().ToString()));
-
-            await _broadcastedTransactionRepository.InsertOrReplace(BroadcastedTransaction.Create(operationId, operation.FromAddress, tx.GetHash().ToString()));
-            await _broadcastedTransactionRepository.InsertOrReplace(BroadcastedTransaction.Create(operationId, operation.ToAddress, tx.GetHash().ToString()));
         }
 
         public async Task BroadCastTransaction(Guid operationId, string txHex)

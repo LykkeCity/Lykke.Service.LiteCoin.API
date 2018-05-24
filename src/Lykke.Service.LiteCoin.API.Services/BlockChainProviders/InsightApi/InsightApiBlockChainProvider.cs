@@ -161,10 +161,21 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
                 AmountSatoshi = p.Sum(x => x.AmountSatoshi)
             }).ToList();
 
+            //tx change calculation
+            foreach(var output in outputs)
+            {
+                var sourceInputForChange = inputs.FirstOrDefault(p => p.Address == output.Address);
+                if(sourceInputForChange != null)
+                {
+                    sourceInputForChange.AmountSatoshi -= output.AmountSatoshi;
+                    output.AmountSatoshi = 0;
+                }
+            }
+
             return new AggregatedInputsOutputs
             {
-                Inputs = inputs,
-                Outputs = outputs,
+                Inputs = inputs.Where(p => p.AmountSatoshi > 0),
+                Outputs = outputs.Where(p => p.AmountSatoshi > 0),
                 TxHash = txHash,
                 TimeStamp = GetTimeStampFromBlockTime(tx.BlockTime)
             };
