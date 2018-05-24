@@ -66,7 +66,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
         private HistoricalTransactionDto MapToHistoricalTransaction(AggregatedInputsOutputs tx, string requestedAddress)
         {
-            var from = tx.Inputs.OrderByDescending(p => p.AmountSatoshi).First();
+            var from = tx.Inputs.OrderByDescending(p => p.AmountSatoshi).FirstOrDefault();
             var to = tx.Outputs.OrderByDescending(p => p.AmountSatoshi).FirstOrDefault(p => p.Address != from.Address);
 
             return new HistoricalTransactionDto
@@ -74,7 +74,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 TxHash = tx.TxHash,
                 IsSend = IsSend(tx, requestedAddress),
                 AmountSatoshi = to?.AmountSatoshi ?? 0,
-                FromAddress = from.Address,
+                FromAddress = from?.Address,
                 AssetId = Constants.Assets.LiteCoin.AssetId,
                 ToAddress = to?.Address,
                 TimeStamp = tx.TimeStamp
