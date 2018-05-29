@@ -72,7 +72,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             return new HistoricalTransactionDto
             {
                 TxHash = tx.TxHash,
-                IsSend = IsSend(tx, requestedAddress),
                 AmountSatoshi = to?.AmountSatoshi ?? 0,
                 FromAddress = from?.Address,
                 AssetId = Constants.Assets.LiteCoin.AssetId,
