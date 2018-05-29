@@ -18,8 +18,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
         public long AmountSatoshi { get; set; }
 
         public string TxHash { get; set; }
-
-        public bool IsSend { get; set; }
     }
 
     public interface IHistoryService

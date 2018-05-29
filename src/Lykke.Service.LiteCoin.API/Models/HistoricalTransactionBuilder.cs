@@ -18,8 +18,7 @@ namespace Lykke.Service.LiteCoin.API.Models
                 AssetId = source.AssetId,
                 Amount = MoneyConversionHelper.SatoshiToContract(source.AmountSatoshi),
                 Hash = source.TxHash,
-                Timestamp = source.TimeStamp,
-                TransactionType = source.IsSend ? TransactionType.Send : TransactionType.Receive
+                Timestamp = source.TimeStamp
             };
         }
     }
