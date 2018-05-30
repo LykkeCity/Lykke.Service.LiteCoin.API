@@ -83,19 +83,19 @@ namespace Lykke.Job.LiteCoin.Modules
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateBalancesPeriod, nameof(LiteCoinApiSettings.UpdateBalancesPeriod)).Milliseconds));
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateBalancesPeriod, nameof(LiteCoinApiSettings.UpdateBalancesPeriod))));
 
             builder.RegisterType<UpdateFeeRatePeriodicalHandler>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateFeeRatePeriod, nameof(LiteCoinApiSettings.UpdateFeeRatePeriod)).Milliseconds));
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateFeeRatePeriod, nameof(LiteCoinApiSettings.UpdateFeeRatePeriod))));
 
             builder.RegisterType<UpdateObersvableOperationsPeriodicalHandler>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateObservableOperationsPeriod, nameof(LiteCoinApiSettings.UpdateObservableOperationsPeriod)).Milliseconds));
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateObservableOperationsPeriod, nameof(LiteCoinApiSettings.UpdateObservableOperationsPeriod))));
         }
 
         private TimeSpan GetPeriod(string value, string settingName)
