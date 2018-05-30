@@ -14,7 +14,7 @@ using Lykke.Service.LiteCoin.API.Services.Operations;
 
 namespace Lykke.Job.LiteCoin.Functions
 {
-    public class UpdateObservableOperations
+    public class UpdateObservableOperationsFunctions
     {
         private readonly IUnconfirmedTransactionRepository _unconfirmedTransactionRepository;
         private readonly IBlockChainProvider _blockChainProvider;
@@ -25,7 +25,7 @@ namespace Lykke.Job.LiteCoin.Functions
         private readonly IOperationEventRepository _operationEventRepository;
         private readonly IWalletBalanceService _walletBalanceService;
         
-        public UpdateObservableOperations(IUnconfirmedTransactionRepository unconfirmedTransactionRepository, 
+        public UpdateObservableOperationsFunctions(IUnconfirmedTransactionRepository unconfirmedTransactionRepository, 
             IBlockChainProvider blockChainProvider,
             IObservableOperationRepository observableOperationRepository, 
             OperationsConfirmationsSettings confirmationsSettings,
@@ -44,7 +44,6 @@ namespace Lykke.Job.LiteCoin.Functions
             _walletBalanceService = walletBalanceService;
         }
 
-        [TimerTrigger("00:02:00")]
         public async Task DetectUnconfirmedTransactions()
         {
             var unconfirmedTxs = await _unconfirmedTransactionRepository.GetAll();
@@ -60,7 +59,7 @@ namespace Lykke.Job.LiteCoin.Functions
             var operationMeta = await _operationMetaRepository.Get(unconfirmedTransaction.OperationId);
             if (operationMeta == null)
             {
-                await _log.WriteWarningAsync(nameof(UpdateObservableOperations), nameof(DetectUnconfirmedTransactions),
+                await _log.WriteWarningAsync(nameof(UpdateObservableOperationsFunctions), nameof(DetectUnconfirmedTransactions),
                     unconfirmedTransaction.ToJson(), "OperationMeta not found");
 
                 return;

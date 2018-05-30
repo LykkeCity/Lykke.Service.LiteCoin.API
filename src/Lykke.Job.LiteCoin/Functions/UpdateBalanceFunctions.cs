@@ -27,7 +27,6 @@ namespace Lykke.Job.LiteCoin.Functions
             _walletBalanceSettings = walletBalanceSettings;
         }
 
-        [TimerTrigger("00:10:00")]
         public async Task UpdateBalances()
         {
             string continuation = null;

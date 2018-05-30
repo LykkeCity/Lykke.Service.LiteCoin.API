@@ -17,8 +17,6 @@ namespace Lykke.Job.LiteCoin.Functions
         }
 
 
-
-        [TimerTrigger("01:00:00")]
         public Task UpdateDynamicFee()
         {
             return _feeRateFacade.UpdateFeeRate();

@@ -1,6 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
+using Lykke.Job.LiteCoin.Functions;
+using Lykke.Job.LiteCoin.PeriodicalHandlers;
 using Lykke.JobTriggers.Extenstions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
@@ -51,7 +54,7 @@ namespace Lykke.Job.LiteCoin.Modules
 
             RegisterAzureQueueHandlers(builder);
 
-            // TODO: Add your dependencies here
+            RegisterPeriodicalHandlers(builder);
 
             builder.Populate(_services);
         }
@@ -63,6 +66,50 @@ namespace Lykke.Job.LiteCoin.Modules
                 {
                     pool.AddDefaultConnection(_settings.Nested(x=>x.Db.DataConnString));
                 });
+        }
+
+        private void RegisterPeriodicalHandlers(ContainerBuilder builder)
+        {
+            builder.RegisterType<UpdateBalanceFunctions>()
+                .AsSelf();
+
+            builder.RegisterType<UpdateFeeRateFunctions>()
+                .AsSelf();
+
+            builder.RegisterType<UpdateObservableOperationsFunctions>()
+                .AsSelf();
+            
+            builder.RegisterType<UpdateBalancesPeriodicalHandler>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateBalancesPeriod, nameof(LiteCoinApiSettings.UpdateBalancesPeriod)).Milliseconds));
+
+            builder.RegisterType<UpdateFeeRatePeriodicalHandler>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateFeeRatePeriod, nameof(LiteCoinApiSettings.UpdateFeeRatePeriod)).Milliseconds));
+
+            builder.RegisterType<UpdateObersvableOperationsPeriodicalHandler>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateObservableOperationsPeriod, nameof(LiteCoinApiSettings.UpdateObservableOperationsPeriod)).Milliseconds));
+        }
+
+        private TimeSpan GetPeriod(string value, string settingName)
+        {
+            try
+            {
+                var result = TimeSpan.Parse(value);
+
+                return result;
+            }
+            catch (FormatException e)
+            {
+                throw new FormatException($"Setting {settingName} parsing failed. Use hh:mm:ss format for timespan", innerException: e);
+            }
         }
 
     }
