@@ -14,7 +14,7 @@ namespace Lykke.Job.LiteCoin.PeriodicalHandlers
 
         public UpdateFeeRatePeriodicalHandler(TimeSpan period, ILog log, UpdateFeeRateFunctions functions) 
             : base(nameof(UpdateFeeRatePeriodicalHandler),
-                period.Milliseconds, 
+                (int) period.TotalMilliseconds, 
                 log.CreateComponentScope(nameof(UpdateObservableOperationsFunctions)))
         {
             _functions = functions;
