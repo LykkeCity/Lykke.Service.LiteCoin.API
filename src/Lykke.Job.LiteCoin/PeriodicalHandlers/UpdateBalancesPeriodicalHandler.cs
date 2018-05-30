@@ -12,9 +12,9 @@ namespace Lykke.Job.LiteCoin.PeriodicalHandlers
     {
         private readonly UpdateBalanceFunctions _functions;
 
-        public UpdateBalancesPeriodicalHandler(int periodMs, ILog log, UpdateBalanceFunctions functions) 
-            : base(nameof(UpdateBalancesPeriodicalHandler), 
-                periodMs,
+        public UpdateBalancesPeriodicalHandler(TimeSpan period, ILog log, UpdateBalanceFunctions functions) 
+            : base(nameof(UpdateBalancesPeriodicalHandler),
+                period.Milliseconds,
                 log.CreateComponentScope(nameof(UpdateBalancesPeriodicalHandler)))
         {
             _functions = functions;

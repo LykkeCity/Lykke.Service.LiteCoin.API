@@ -12,9 +12,9 @@ namespace Lykke.Job.LiteCoin.PeriodicalHandlers
     {
         private readonly UpdateObservableOperationsFunctions _functions;
 
-        public UpdateObersvableOperationsPeriodicalHandler(int periodMs, ILog log, UpdateObservableOperationsFunctions functions) 
+        public UpdateObersvableOperationsPeriodicalHandler(TimeSpan period, ILog log, UpdateObservableOperationsFunctions functions) 
             : base(nameof(UpdateObersvableOperationsPeriodicalHandler), 
-                periodMs, 
+                period.Milliseconds, 
                 log.CreateComponentScope(nameof(UpdateObersvableOperationsPeriodicalHandler)))
         {
             _functions = functions;
