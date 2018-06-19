@@ -45,6 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterTransactionBuilderServices(builder);
             RegisterBroadcastServices(builder);
             RegisterObservableServices(builder);
+            RegisterHistoryServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -122,6 +123,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             {
                 BatchSizeOnUpdate = _settings.CurrentValue.WalletBalanceBatchSizeOnUpdate
             }).AsSelf();
+        }
+
+        private void RegisterHistoryServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<HistoryService>().As<IHistoryService>();
         }
     }
 }

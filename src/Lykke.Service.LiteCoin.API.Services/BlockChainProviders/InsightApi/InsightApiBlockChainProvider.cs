@@ -75,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
                 .AppendPathSegment($"insight-lite-api/rawtx/{tx}");
 
             var resp = await GetJson<RawTxResponce>(url);
-
+            
             return Transaction.Parse(resp.RawTx);
         }
 
@@ -130,6 +130,62 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             }
 
             return result;
+        }
+
+        public async Task<AggregatedInputsOutputs> GetAggregatedInputsOutputs(string txHash)
+        {
+            var tx = await GetTx(txHash);
+
+            if (tx == null)
+            {
+                return null;
+            }
+
+            var inputs = tx.Inputs.Select(p => new
+            {
+                p.Address,
+                p.AmountSatoshi
+            }).GroupBy(p => p.Address).Select(p => new AggregatedInputsOutputs.InputOutput
+            {
+                Address = p.Key,
+                AmountSatoshi = p.Sum(x => x.AmountSatoshi)
+            }).ToList();
+
+            var outputs = tx.Outputs.Select(p => new
+            {
+                Address = p.ScriptPubKey.Addresses?.FirstOrDefault(),
+                AmountSatoshi = Money.FromUnit(p.ValueBtc, MoneyUnit.BTC).Satoshi
+            }).GroupBy(p => p.Address).Select(p => new AggregatedInputsOutputs.InputOutput
+            {
+                Address = p.Key,
+                AmountSatoshi = p.Sum(x => x.AmountSatoshi)
+            }).ToList();
+
+            //tx change calculation
+            foreach(var output in outputs)
+            {
+                var sourceInputForChange = inputs.FirstOrDefault(p => p.Address == output.Address);
+                if(sourceInputForChange != null)
+                {
+                    sourceInputForChange.AmountSatoshi -= output.AmountSatoshi;
+                    output.AmountSatoshi = 0;
+                }
+            }
+
+            return new AggregatedInputsOutputs
+            {
+                Inputs = inputs.Where(p => p.AmountSatoshi > 0),
+                Outputs = outputs.Where(p => p.AmountSatoshi > 0),
+                TxHash = txHash,
+                TimeStamp = GetTimeStampFromBlockTime(tx.BlockTime)
+            };
+        }
+
+        private DateTime GetTimeStampFromBlockTime(long blockTime)
+        {
+            var posixTime = DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
+
+            return posixTime.AddMilliseconds(blockTime * 1000);
         }
 
         private async Task<IEnumerable<AddressUnspentOutputsResponce>> GetUnspentOutputsResponceBatched(IEnumerable<string> addresses)
