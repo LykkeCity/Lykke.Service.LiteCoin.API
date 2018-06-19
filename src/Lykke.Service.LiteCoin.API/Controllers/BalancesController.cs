@@ -11,8 +11,11 @@ using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
+using Lykke.Service.LiteCoin.API.Extensions;
 using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
@@ -82,21 +85,30 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetBalances))]
         [ProducesResponseType(typeof(PaginationResponse<WalletBalanceContract>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<PaginationResponse<WalletBalanceContract>> GetBalances([FromQuery]int take, [FromQuery] string continuation)
+        public async Task<IActionResult> GetBalances([FromQuery] int take, [FromQuery] string continuation)
         {
             if (take <= 0)
             {
-                throw new BusinessException("Take must be greater than zero", ErrorCode.BadInputParameter);
+                ModelState.AddModelError(nameof(take), "Must be greater than zero");
             }
+
+            ModelState.IsValidContinuationToken(continuation);
+
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.ToErrorResponce());
+            }
+
             var padedResult = await _balanceService.GetBalances(take, continuation);
 
-            return PaginationResponse.From(padedResult.Continuation, padedResult.Items.Select(p => new WalletBalanceContract
+            return Ok(PaginationResponse.From(padedResult.Continuation, padedResult.Items.Select(p => new WalletBalanceContract
             {
                 Address = p.Address,
                 Balance = MoneyConversionHelper.SatoshiToContract(p.BalanceSatoshi),
                 AssetId = Constants.Assets.LiteCoin.AssetId,
                 Block = p.UpdatedAtBlockHeight
-            }).ToList().AsReadOnly());
+            }).ToList().AsReadOnly()));
         }
     }
 }
