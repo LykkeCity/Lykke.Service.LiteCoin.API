@@ -4,6 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using Common.Log;
 using Lykke.Job.LiteCoin.Functions;
 using Lykke.Job.LiteCoin.PeriodicalHandlers;
+using Lykke.Job.LiteCoin.Settings;
 using Lykke.JobTriggers.Extenstions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
@@ -78,24 +79,15 @@ namespace Lykke.Job.LiteCoin.Modules
 
             builder.RegisterType<UpdateObservableOperationsFunctions>()
                 .AsSelf();
-            
-            builder.RegisterType<UpdateBalancesPeriodicalHandler>()
-                .As<IStartable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateBalancesPeriod));
 
-            builder.RegisterType<UpdateFeeRatePeriodicalHandler>()
-                .As<IStartable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateFeeRatePeriod));
+            builder.RegisterInstance(new PerodicalHandlerSettings
+            {
+                UpdateObservableOperationsPeriod = _settings.CurrentValue.UpdateObservableOperationsPeriod,
+                UpdateBalancesPeriod = _settings.CurrentValue.UpdateBalancesPeriod,
+                UpdateFeeRatePeriod = _settings.CurrentValue.UpdateFeeRatePeriod
+            }).AsSelf();
 
-            builder.RegisterType<UpdateObersvableOperationsPeriodicalHandler>()
-                .As<IStartable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateObservableOperationsPeriod));
+            builder.RegisterType<PeriodicalHandlerHost>().AsSelf().SingleInstance();
         }
     }
 }

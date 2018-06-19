@@ -8,6 +8,7 @@ using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Job.LiteCoin.Models;
 using Lykke.Job.LiteCoin.Modules;
+using Lykke.Job.LiteCoin.PeriodicalHandlers;
 using Lykke.JobTriggers.Triggers;
 using Lykke.Logs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
@@ -124,7 +125,7 @@ namespace Lykke.Job.LiteCoin
         {
             try
             {
-                // NOTE: Job not yet recieve and process IsAlive requests here
+                ApplicationContainer.Resolve<PeriodicalHandlerHost>().Start();
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
 
@@ -144,9 +145,7 @@ namespace Lykke.Job.LiteCoin
         {
             try
             {
-                // NOTE: Job still can recieve and process IsAlive requests here, so take care about it if you add logic here.
-
-                await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
+                ApplicationContainer.Resolve<PeriodicalHandlerHost>().Stop();
 
                 _triggerHost?.Cancel();
 
