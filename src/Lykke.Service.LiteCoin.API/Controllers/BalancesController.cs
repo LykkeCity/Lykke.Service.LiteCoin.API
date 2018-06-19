@@ -85,14 +85,14 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetBalances))]
         [ProducesResponseType(typeof(PaginationResponse<WalletBalanceContract>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IActionResult> GetBalances([FromQuery]int take, [FromQuery] string continuation)
+        public async Task<IActionResult> GetBalances([FromQuery] int take, [FromQuery] string continuation)
         {
             if (take <= 0)
             {
                 ModelState.AddModelError(nameof(take), "Must be greater than zero");
             }
 
-            ModelState.ValidateContinuationToken(continuation);
+            ModelState.IsValidContinuationToken(continuation);
 
 
             if (!ModelState.IsValid)

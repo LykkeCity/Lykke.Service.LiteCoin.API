@@ -30,16 +30,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(PaginationResponse<AssetResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets")]
-        public async Task<IActionResult> GetPaged([FromQuery]int take, [FromQuery]string continuation)
+        public async Task<IActionResult> GetPaged([FromQuery] int take, [FromQuery] string continuation)
         {
-            if (take <= 0)
-            {
-                ModelState.AddModelError(nameof(take), "Must be greater than zero");
-            }
-
-            ModelState.ValidateContinuationToken(continuation);
-
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || 
+                !ModelState.IsValidContinuationToken(continuation) || 
+                !ModelState.IsValidTakeParameter(take))
             {
                 return BadRequest(ModelState.ToErrorResponce());
             }
@@ -52,7 +47,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 AssetId = p.AssetId,
                 Accuracy = p.Accuracy,
                 Name = p.Name
-            }).ToList().AsReadOnly()));
+            }).ToArray()));
         }
 
         [SwaggerOperation(nameof(GetById))]
