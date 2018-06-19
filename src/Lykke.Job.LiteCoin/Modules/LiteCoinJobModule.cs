@@ -83,34 +83,19 @@ namespace Lykke.Job.LiteCoin.Modules
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateBalancesPeriod, nameof(LiteCoinApiSettings.UpdateBalancesPeriod))));
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateBalancesPeriod));
 
             builder.RegisterType<UpdateFeeRatePeriodicalHandler>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateFeeRatePeriod, nameof(LiteCoinApiSettings.UpdateFeeRatePeriod))));
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateFeeRatePeriod));
 
             builder.RegisterType<UpdateObersvableOperationsPeriodicalHandler>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(GetPeriod(_settings.CurrentValue.UpdateObservableOperationsPeriod, nameof(LiteCoinApiSettings.UpdateObservableOperationsPeriod))));
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.UpdateObservableOperationsPeriod));
         }
-
-        private TimeSpan GetPeriod(string value, string settingName)
-        {
-            try
-            {
-                var result = TimeSpan.Parse(value);
-
-                return result;
-            }
-            catch (FormatException e)
-            {
-                throw new FormatException($"Setting {settingName} parsing failed. Use hh:mm:ss format for timespan", innerException: e);
-            }
-        }
-
     }
 }
