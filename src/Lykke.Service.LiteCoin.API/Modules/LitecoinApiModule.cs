@@ -3,9 +3,9 @@ using Autofac.Extensions.DependencyInjection;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
+using Lykke.Service.LiteCoin.API.LifetimeManagers;
 using Lykke.Service.LiteCoin.API.Services;
 using Lykke.Service.LiteCoin.API.Services.Health;
-using Lykke.Service.LiteCoin.API.Services.LifeiteManagers;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,10 +36,10 @@ namespace Lykke.Service.LiteCoin.API.Modules
                 .As<IHealthService>()
                 .SingleInstance();
 
-            builder.RegisterType<StartupManager>()
+            builder.RegisterType<ApiStartupManager>()
                 .As<IStartupManager>();
 
-            builder.RegisterType<ShutdownManager>()
+            builder.RegisterType<ApiShutdownManager>()
                 .As<IShutdownManager>();
 
             builder.Populate(_services);

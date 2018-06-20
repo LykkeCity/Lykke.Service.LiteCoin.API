@@ -1,12 +1,16 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
+using Lykke.Job.LiteCoin.Functions;
+using Lykke.Job.LiteCoin.LifetimeManagers;
+using Lykke.Job.LiteCoin.PeriodicalHandlers;
+using Lykke.Job.LiteCoin.Settings;
 using Lykke.JobTriggers.Extenstions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Services;
 using Lykke.Service.LiteCoin.API.Services.Health;
-using Lykke.Service.LiteCoin.API.Services.LifeiteManagers;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,15 +47,15 @@ namespace Lykke.Job.LiteCoin.Modules
                 .As<IHealthService>()
                 .SingleInstance();
 
-            builder.RegisterType<StartupManager>()
+            builder.RegisterType<JobStartupManager>()
                 .As<IStartupManager>();
 
-            builder.RegisterType<ShutdownManager>()
+            builder.RegisterType<JobShutdownManager>()
                 .As<IShutdownManager>();
 
             RegisterAzureQueueHandlers(builder);
 
-            // TODO: Add your dependencies here
+            RegisterPeriodicalHandlers(builder);
 
             builder.Populate(_services);
         }
@@ -65,5 +69,25 @@ namespace Lykke.Job.LiteCoin.Modules
                 });
         }
 
+        private void RegisterPeriodicalHandlers(ContainerBuilder builder)
+        {
+            builder.RegisterType<UpdateBalanceFunctions>()
+                .AsSelf();
+
+            builder.RegisterType<UpdateFeeRateFunctions>()
+                .AsSelf();
+
+            builder.RegisterType<UpdateObservableOperationsFunctions>()
+                .AsSelf();
+
+            builder.RegisterInstance(new PerodicalHandlerSettings
+            {
+                UpdateObservableOperationsPeriod = _settings.CurrentValue.UpdateObservableOperationsPeriod,
+                UpdateBalancesPeriod = _settings.CurrentValue.UpdateBalancesPeriod,
+                UpdateFeeRatePeriod = _settings.CurrentValue.UpdateFeeRatePeriod
+            }).AsSelf();
+
+            builder.RegisterType<PeriodicalHandlerHost>().AsSelf().SingleInstance();
+        }
     }
 }

@@ -2,7 +2,7 @@
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Services;
 
-namespace Lykke.Service.LiteCoin.API.Services.LifeiteManagers
+namespace Lykke.Service.LiteCoin.API.LifetimeManagers
 {
     // NOTE: Sometimes, startup process which is expressed explicitly is not just better, 
     // but the only way. If this is your case, use this class to manage startup.
@@ -11,11 +11,11 @@ namespace Lykke.Service.LiteCoin.API.Services.LifeiteManagers
     // Do not forget to remove As<IStartable>() and AutoActivate() from DI registartions of services, 
     // which you want to startup explicitly.
 
-    public class StartupManager : IStartupManager
+    public class ApiStartupManager : IStartupManager
     {
         private readonly ILog _log;
 
-        public StartupManager(ILog log)
+        public ApiStartupManager(ILog log)
         {
             _log = log;
         }

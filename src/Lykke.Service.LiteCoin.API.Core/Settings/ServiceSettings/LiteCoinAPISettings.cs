@@ -1,4 +1,5 @@
-﻿using Lykke.SettingsReader.Attributes;
+﻿using System;
+using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
 {
@@ -25,5 +26,11 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public int MinConfirmationsToDetectOperation { get; set; } = 3;
 
         public int WalletBalanceBatchSizeOnUpdate { get; set; } = 100;
+
+        public TimeSpan UpdateBalancesPeriod { get; set; }
+
+        public TimeSpan UpdateFeeRatePeriod { get; set; }
+
+        public TimeSpan UpdateObservableOperationsPeriod { get; set; } 
     }
 }
