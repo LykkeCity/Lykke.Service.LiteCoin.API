@@ -8,7 +8,7 @@ using Lykke.Job.LiteCoin.Settings;
 
 namespace Lykke.Job.LiteCoin.PeriodicalHandlers
 {
-    public class PeriodicalHandlerHost
+    public class PeriodicalHandlerHost:IDisposable
     {
         private readonly IEnumerable<TimerTrigger> _timerTriggers;
 
@@ -54,6 +54,14 @@ namespace Lykke.Job.LiteCoin.PeriodicalHandlers
             foreach (var timerTrigger in _timerTriggers)
             {
                 timerTrigger.Stop();
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var timerTrigger in _timerTriggers)
+            {
+                timerTrigger.Dispose();
             }
         }
     }
