@@ -125,10 +125,8 @@ namespace Lykke.Job.LiteCoin
         {
             try
             {
-                ApplicationContainer.Resolve<PeriodicalHandlerHost>().Start();
-
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
-
+                
                 _triggerHost = new TriggerHost(new AutofacServiceProvider(ApplicationContainer));
 
                 _triggerHostTask = _triggerHost.Start();
@@ -145,7 +143,7 @@ namespace Lykke.Job.LiteCoin
         {
             try
             {
-                ApplicationContainer.Resolve<PeriodicalHandlerHost>().Stop();
+                await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
 
                 _triggerHost?.Cancel();
 
