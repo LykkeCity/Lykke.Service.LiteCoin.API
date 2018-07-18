@@ -81,12 +81,20 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task BroadCastTransaction(Transaction tx)
         {
-            await _insightApiSettings.Url.AppendPathSegment("insight-lite-api/tx/send")
-                .PostJsonAsync(new BroadcastTransactionRequestContract
-                {
-                    RawTx = tx.ToHex()
-                })
-                .ReceiveJson<BroadcastTransactionResponceContract>();
+            try
+            {
+                await _insightApiSettings.Url.AppendPathSegment("insight-lite-api/tx/send")
+                    .PostJsonAsync(new BroadcastTransactionRequestContract
+                    {
+                        RawTx = tx.ToHex()
+                    })
+                    .ReceiveJson<BroadcastTransactionResponceContract>();
+            }
+            catch (FlurlHttpException e)
+            {
+                throw new BusinessException($"Error while proceeding operation within Blockchain Insight Api. Responce: {await e.GetResponseStringAsync()}", ErrorCode.BlockChainApiError, e);
+            }
+
         }
 
         public async Task<int> GetTxConfirmationCount(string txHash)
