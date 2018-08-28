@@ -26,23 +26,25 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         private readonly IAddressValidator _addressValidator;
         private readonly IBroadcastService _broadcastService;
         private readonly IObservableOperationService _observableOperationService;
-
+        private readonly IOperationEventRepository _operationEventRepository;
 
         public OperationsController(IOperationService operationService, 
             IAddressValidator addressValidator, 
             IBroadcastService broadcastService, 
-            IObservableOperationService observableOperationService)
+            IObservableOperationService observableOperationService, IOperationEventRepository operationEventRepository)
         {
             _operationService = operationService;
             _addressValidator = addressValidator;
             _broadcastService = broadcastService;
             _observableOperationService = observableOperationService;
+            _operationEventRepository = operationEventRepository;
         }
 
         [HttpPost("api/transactions/single")]
         [ProducesResponseType(typeof(BuildTransactionResponse), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<BuildTransactionResponse> BuildSingle([FromBody] BuildSingleTransactionRequest request)
+        [ProducesResponseType( 409)]
+        public async Task<IActionResult> BuildSingle([FromBody] BuildSingleTransactionRequest request)
         {
             if (request == null)
             {
@@ -93,20 +95,24 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
                 fromAddressPubkey = _addressValidator.GetPubkey(pubKeyString);
             }
+            if (await _operationEventRepository.Exist(request.OperationId, OperationEventType.Broadcasted))
+            {
+                return StatusCode(409);
+            }
 
-            var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId, 
-                fromBitcoinAddress, 
-                fromAddressPubkey, 
-                toBitcoinAddress, 
-                request.AssetId, 
-                new Money(amountSatoshi), 
+            var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId,
+                fromBitcoinAddress,
+                fromAddressPubkey,
+                toBitcoinAddress,
+                request.AssetId,
+                new Money(amountSatoshi),
                 request.IncludeFee);
 
-            
-            return new BuildTransactionResponse
+
+            return Ok(new BuildTransactionResponse
             {
                 TransactionContext = tx
-            };
+            });
         }
 
         [HttpPost("api/transactions/broadcast")]
