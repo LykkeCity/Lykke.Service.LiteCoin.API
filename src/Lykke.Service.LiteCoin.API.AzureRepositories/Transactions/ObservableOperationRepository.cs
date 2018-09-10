@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureStorage;
+using Common;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Helpers;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -46,9 +47,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
 
         public static class ByOperationId 
         {
-            public static string GeneratePartitionKey()
+            public static string GeneratePartitionKey(Guid operationId)
             {
-                return "ByOperationId";
+                return operationId.ToString().CalculateHexHash32(3);
             }
 
             public static string GenerateRowKey(Guid operationId)
@@ -58,7 +59,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
 
             public static ObservableOperationEntity Create(IObservableOperation source)
             {
-                return Map(GeneratePartitionKey(), GenerateRowKey(source.OperationId), source);
+                return Map(GeneratePartitionKey(source.OperationId), GenerateRowKey(source.OperationId), source);
             }
         }
     }
@@ -82,14 +83,14 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
         {
             foreach (var operationId in operationIds)
             {
-                await _storage.DeleteIfExistAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(),
+                await _storage.DeleteIfExistAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(operationId),
                     ObservableOperationEntity.ByOperationId.GenerateRowKey(operationId));
             }
         }
 
         public async Task<IObservableOperation> GetById(Guid opId)
         {
-            return await _storage.GetDataAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(),
+            return await _storage.GetDataAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(opId),
                 UnconfirmedTransactionEntity.GenerateRowKey(opId));
         }
     }

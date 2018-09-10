@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
+using Common;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Helpers;
 using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -18,9 +19,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         public DateTime Updated { get; set; }
         public int UpdatedAtBlockHeight { get; set; }
 
-        public static string GeneratePartitionKey()
+        public static string GeneratePartitionKey(string address)
         {
-            return "ByAddress";
+            return address.CalculateHexHash32(3);
         }
 
         public static string GenerateRowKey(string address)
@@ -35,7 +36,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
                 Address = source.Address,
                 BalanceSatoshi = source.BalanceSatoshi,
                 RowKey = GenerateRowKey(source.Address),
-                PartitionKey = GeneratePartitionKey(),
+                PartitionKey = GeneratePartitionKey(source.Address),
                 Updated = source.Updated,
                 UpdatedAtBlockHeight = source.UpdatedAtBlockHeight
             };
@@ -58,13 +59,13 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
 
         public Task DeleteIfExist(string address)
         {
-            return _storage.DeleteIfExistAsync(WalletBalanceEntity.GeneratePartitionKey(),
+            return _storage.DeleteIfExistAsync(WalletBalanceEntity.GeneratePartitionKey(address),
                 WalletBalanceEntity.GenerateRowKey(address));
         }
 
         public async Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
-            var result = await _storage.GetDataWithContinuationTokenAsync(WalletBalanceEntity.GeneratePartitionKey(), take, continuation);
+            var result = await _storage.GetDataWithContinuationTokenAsync(take, continuation);
 
             return PaginationResult<IWalletBalance>.Create(result.Entities, result.ContinuationToken);
         }
