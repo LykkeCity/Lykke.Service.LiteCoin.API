@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
+using Common;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -15,9 +16,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
     {
         public string Address { get; set; }
 
-        public static string GeneratePartitionKey()
+        public static string GeneratePartitionKey(string address)
         {
-            return "ByAddress";
+            return address.CalculateHexHash32(3);
         }
 
         public static string GenerateRowKey(string address)
@@ -30,7 +31,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
             return new ObservableWalletEntity
             {
                 Address = source.Address,
-                PartitionKey = GeneratePartitionKey(),
+                PartitionKey = GeneratePartitionKey(source.Address),
                 RowKey = GenerateRowKey(source.Address)
             };
         }
@@ -60,12 +61,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
 
         public async Task<IEnumerable<IObservableWallet>> GetAll()
         {
-            return await _storage.GetDataAsync(ObservableWalletEntity.GeneratePartitionKey());
+            return await _storage.GetDataAsync();
         }
 
         public async Task<IPaginationResult<IObservableWallet>> GetPaged(int take, string continuation)
         {
-            var result = await _storage.GetDataWithContinuationTokenAsync(ObservableWalletEntity.GeneratePartitionKey(), take, continuation);
+            var result = await _storage.GetDataWithContinuationTokenAsync(take, continuation);
 
             return PaginationResult<IObservableWallet>.Create(result.Entities, result.ContinuationToken);
         }
@@ -74,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         {
             try
             {
-                await _storage.DeleteAsync(ObservableWalletEntity.GeneratePartitionKey(),
+                await _storage.DeleteAsync(ObservableWalletEntity.GeneratePartitionKey(address),
                     ObservableWalletEntity.GenerateRowKey(address));
             }
             catch (StorageException e) when (e.RequestInformation.HttpStatusCode == EntityNotExistsHttpStatusCode)
@@ -85,7 +86,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
 
         public async Task<IObservableWallet> Get(string address)
         {
-            return await _storage.GetDataAsync(ObservableWalletEntity.GeneratePartitionKey(), ObservableWalletEntity.GenerateRowKey(address));
+            return await _storage.GetDataAsync(ObservableWalletEntity.GeneratePartitionKey(address), ObservableWalletEntity.GenerateRowKey(address));
         }
     }
 }
