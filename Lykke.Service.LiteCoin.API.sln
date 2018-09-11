@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Tests", "4. Tests", "{8F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.Job.LiteCoin", "src\Lykke.Job.LiteCoin\Lykke.Job.LiteCoin.csproj", "{026FAF17-7A2E-4DD6-B114-4468AF8A7EC8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.Service.LiteCoin.API.ObservableWalletsConverter", "tools\Lykke.Service.LiteCoin.API.ObservableWalletsConverter\Lykke.Service.LiteCoin.API.ObservableWalletsConverter.csproj", "{690B3B3E-92C6-4E7A-84F0-7A87EDAA7615}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{026FAF17-7A2E-4DD6-B114-4468AF8A7EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{026FAF17-7A2E-4DD6-B114-4468AF8A7EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{026FAF17-7A2E-4DD6-B114-4468AF8A7EC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{690B3B3E-92C6-4E7A-84F0-7A87EDAA7615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{690B3B3E-92C6-4E7A-84F0-7A87EDAA7615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{690B3B3E-92C6-4E7A-84F0-7A87EDAA7615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{690B3B3E-92C6-4E7A-84F0-7A87EDAA7615}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

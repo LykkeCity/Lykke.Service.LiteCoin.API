@@ -18,7 +18,7 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 {
-    public  class RepositoryModule:Module
+    public class RepositoryModule : Module
     {
         private readonly ILog _log;
         private readonly IReloadingManager<LiteCoinApiSettings> _settings;
@@ -42,38 +42,38 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
             builder.RegisterInstance(new OperationMetaRepository(
                 AzureTableStorage<OperationMetaEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "OperationMeta", _log)))
+                    "OperationMetaRef", _log)))
                 .As<IOperationMetaRepository>()
                 .SingleInstance();
 
             builder.RegisterInstance(new OperationEventRepository(
                     AzureTableStorage<OperationEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "OperationEvents", _log)))
+                        "OperationEventsRef", _log)))
                 .As<IOperationEventRepository>()
                 .SingleInstance();
 
 
             builder.RegisterInstance(new UnconfirmedTransactionRepository(
                 AzureTableStorage<UnconfirmedTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "UnconfirmedTransactions", _log)))
+                    "UnconfirmedTransactionsRef", _log)))
                 .As<IUnconfirmedTransactionRepository>()
                 .SingleInstance();
 
             builder.RegisterInstance(new ObservableOperationRepository(
                 AzureTableStorage<ObservableOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "ObservableOperations", _log)))
+                    "ObservableOperationsRef", _log)))
                 .As<IObservableOperationRepository>()
                 .SingleInstance();
 
             builder.RegisterInstance(new ObservableWalletRepository(
                 AzureTableStorage<ObservableWalletEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "ObservableWallets", _log)))
+                    "ObservableWalletsRef", _log)))
                 .As<IObservableWalletRepository>()
                 .SingleInstance();
 
             builder.RegisterInstance(new WalletBalanceRepository(
                     AzureTableStorage<WalletBalanceEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "WalletBalances", _log)))
+                        "WalletBalancesRef", _log)))
                 .As<IWalletBalanceRepository>()
                 .SingleInstance();
 
