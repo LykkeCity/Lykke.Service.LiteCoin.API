@@ -60,7 +60,7 @@ namespace Lykke.Service.LiteCoin.API.ObservableWalletsConverter
             Console.WriteLine();
             Console.WriteLine("Press any key to exit");
 
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         private static async Task ConvertAddresses(string settingsUrl)
