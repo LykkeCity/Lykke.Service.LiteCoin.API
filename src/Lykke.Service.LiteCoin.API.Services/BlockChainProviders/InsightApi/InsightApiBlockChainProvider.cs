@@ -125,6 +125,10 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<IEnumerable<(string address, long balance)>> GetBalancesSatoshiFromUnspentOutputsBatched(IEnumerable<string> addresses, int minConfirmationCount)
         {
+            if (!addresses.Any())
+            {
+                return Enumerable.Empty<(string address, long balance)>();
+            }
             var allUnspent = (await GetUnspentOutputsResponceBatched(addresses))
                 .Where(p => p.Confirmation >= minConfirmationCount)
                 .ToList();
