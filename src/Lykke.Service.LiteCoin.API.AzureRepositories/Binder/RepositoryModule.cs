@@ -18,7 +18,7 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 {
-    public  class RepositoryModule:Module
+    public class RepositoryModule : Module
     {
         private readonly ILog _log;
         private readonly IReloadingManager<LiteCoinApiSettings> _settings;
@@ -37,44 +37,52 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
         private void RegisterRepo(ContainerBuilder builder)
         {
             builder.RegisterInstance(new AssetRepository())
-                .As<IAssetRepository>();
+                .As<IAssetRepository>()
+                .SingleInstance();
 
             builder.RegisterInstance(new OperationMetaRepository(
                 AzureTableStorage<OperationMetaEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "OperationMeta", _log)))
-                .As<IOperationMetaRepository>();
+                    "OperationMetaRef", _log)))
+                .As<IOperationMetaRepository>()
+                .SingleInstance();
 
             builder.RegisterInstance(new OperationEventRepository(
                     AzureTableStorage<OperationEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "OperationEvents", _log)))
-                .As<IOperationEventRepository>();
+                        "OperationEventsRef", _log)))
+                .As<IOperationEventRepository>()
+                .SingleInstance();
 
 
             builder.RegisterInstance(new UnconfirmedTransactionRepository(
                 AzureTableStorage<UnconfirmedTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "UnconfirmedTransactions", _log)))
-                .As<IUnconfirmedTransactionRepository>();
+                    "UnconfirmedTransactionsRef", _log)))
+                .As<IUnconfirmedTransactionRepository>()
+                .SingleInstance();
 
             builder.RegisterInstance(new ObservableOperationRepository(
                 AzureTableStorage<ObservableOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "ObservableOperations", _log)))
-                .As<IObservableOperationRepository>();
+                    "ObservableOperationsRef", _log)))
+                .As<IObservableOperationRepository>()
+                .SingleInstance();
 
             builder.RegisterInstance(new ObservableWalletRepository(
                 AzureTableStorage<ObservableWalletEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "ObservableWallets", _log)))
-                .As<IObservableWalletRepository>();
+                    "ObservableWalletsRef", _log)))
+                .As<IObservableWalletRepository>()
+                .SingleInstance();
 
             builder.RegisterInstance(new WalletBalanceRepository(
                     AzureTableStorage<WalletBalanceEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "WalletBalances", _log)))
-                .As<IWalletBalanceRepository>();
+                        "WalletBalancesRef", _log)))
+                .As<IWalletBalanceRepository>()
+                .SingleInstance();
 
 
             builder.RegisterInstance(new DynamicFeeRateRepository(
                     AzureTableStorage<DynamicFeeRateEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "DynamicFeeRate", _log)))
-                .As<IDynamicFeeRateRepository>();
+                .As<IDynamicFeeRateRepository>()
+                .SingleInstance();
         }
 
         private void RegisterBlob(ContainerBuilder builder)

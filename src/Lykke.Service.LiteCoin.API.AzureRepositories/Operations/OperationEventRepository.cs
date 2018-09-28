@@ -20,7 +20,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
 
         public static string GeneratePartitionKey(Guid operationId)
         {
-            return operationId.ToString();
+            return operationId.ToString().CalculateHexHash32(3);
         }
 
         public static string GenerateRowKey(OperationEventType type)
