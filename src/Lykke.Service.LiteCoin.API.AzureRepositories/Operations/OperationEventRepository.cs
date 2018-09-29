@@ -23,9 +23,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
             return operationId.ToString().CalculateHexHash32(3);
         }
 
-        public static string GenerateRowKey(OperationEventType type)
+        public static string GenerateRowKey(OperationEventType type, Guid operationId)
         {
-            return type.ToString();
+            return $"{type.ToString()}_{operationId}";
         }
 
         public static OperationEventTableEntity Create(IOperationEvent source)
@@ -35,9 +35,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                 DateTime = source.DateTime,
                 OperationId = source.OperationId,
                 PartitionKey = GeneratePartitionKey(source.OperationId),
-                RowKey = GenerateRowKey(source.Type),
+                RowKey = GenerateRowKey(source.Type, source.OperationId),
                 Context = source.Context
-               
             };
         }
     }
@@ -59,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
         public async Task<bool> Exist(Guid operationId, OperationEventType type)
         {
             return await _storage.GetDataAsync(OperationEventTableEntity.GeneratePartitionKey(operationId),
-                       OperationEventTableEntity.GenerateRowKey(type)) != null;
+                       OperationEventTableEntity.GenerateRowKey(type, operationId)) != null;
         }
     }
 }
